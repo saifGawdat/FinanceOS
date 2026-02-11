@@ -53,7 +53,7 @@ export class ExpenseService {
     const totalPages = Math.ceil(totalItems / validatedLimit);
 
     const expenses = await Expense.find(query)
-      .sort({ date: -1 })
+      .sort({ date: -1, createdAt: -1 })
       .skip(skip)
       .limit(validatedLimit)
       .lean();

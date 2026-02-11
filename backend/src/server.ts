@@ -11,10 +11,10 @@ const app = express();
 connectDB();
 
 // Middleware
+// Allow all origins (CORS: *)
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
+    origin: "*",
   }),
 );
 app.use(express.json());

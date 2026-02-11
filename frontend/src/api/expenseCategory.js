@@ -13,7 +13,7 @@ export const getExpenseCategories = async (month, year) => {
 // Get monthly expense breakdown
 export const getMonthlyExpenseBreakdown = async (month, year) => {
   const response = await axios.get(
-    `/expense-category/monthly/${month}/${year}`
+    `/expense-category/monthly/${month}/${year}`,
   );
   return response.data;
 };
@@ -39,5 +39,14 @@ export const deleteExpenseCategory = async (id) => {
 // Get all unique category names for a user
 export const getUniqueCategories = async () => {
   const response = await axios.get("/expense-category/unique");
+  return response.data;
+};
+
+// Copy categories from previous month
+export const copyPreviousMonthCategories = async (month, year) => {
+  const response = await axios.post("/expense-category/copy-previous", {
+    month,
+    year,
+  });
   return response.data;
 };

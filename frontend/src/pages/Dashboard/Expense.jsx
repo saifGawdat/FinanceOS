@@ -12,6 +12,7 @@ import {
   createExpenseCategory,
   deleteExpenseCategory,
   getUniqueCategories,
+  copyPreviousMonthCategories,
 } from "../../api/expenseCategory";
 import { getExpenses } from "../../api/expense";
 import { exportExpenseToExcel } from "../../utils/exportToExcel";
@@ -61,6 +62,11 @@ const Expense = () => {
     description: "",
   });
   const [isCategorySubmitting, setIsCategorySubmitting] = useState(false);
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
+  const [deleteExpenseId, setDeleteExpenseId] = useState(null);
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUserCategories = useCallback(async () => {
     try {
@@ -158,15 +164,8 @@ const Expense = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this expense?")) {
-      try {
-        await API.delete(`/expense/${id}`);
-        fetchExpenses();
-      } catch (error) {
-        console.error("Error deleting expense:", error);
-      }
-    }
+  const handleDelete = (id) => {
+    setDeleteExpenseId(id);
   };
 
   const handleExport = () => {
@@ -204,18 +203,38 @@ const Expense = () => {
     }
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (
-      window.confirm("Are you sure you want to delete this category expense?")
-    ) {
-      try {
-        await deleteExpenseCategory(id);
-        fetchCategories();
-        fetchUserCategories();
-      } catch (error) {
-        console.error("Error deleting category expense:", error);
-        setError("Failed to delete category expense");
-      }
+  const handleDeleteCategory = (id) => {
+    setDeleteCategoryId(id);
+  };
+
+  const confirmDeleteExpense = async () => {
+    if (!deleteExpenseId) return;
+    try {
+      setIsDeleting(true);
+      await API.delete(`/expense/${deleteExpenseId}`);
+      setDeleteExpenseId(null);
+      await fetchExpenses();
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      setError("Failed to delete expense");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const confirmDeleteCategory = async () => {
+    if (!deleteCategoryId) return;
+    try {
+      setIsDeleting(true);
+      await deleteExpenseCategory(deleteCategoryId);
+      setDeleteCategoryId(null);
+      await fetchCategories();
+      await fetchUserCategories();
+    } catch (error) {
+      console.error("Error deleting category expense:", error);
+      setError("Failed to delete category expense");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -238,6 +257,30 @@ const Expense = () => {
   };
 
   const allCategoryNames = [...new Set(categories.map((c) => c.category))];
+
+  const handleCopyPreviousMonthCategories = () => {
+    setCopyStatus("");
+    setShowCopyModal(true);
+  };
+
+  const confirmCopyPreviousMonthCategories = async () => {
+    try {
+      setIsSubmitting(true);
+      setCopyStatus("");
+      await copyPreviousMonthCategories(month, year);
+      await fetchCategories();
+      await fetchUserCategories();
+      setCopyStatus("Categories copied successfully!");
+    } catch (error) {
+      console.error("Error copying categories:", error);
+      setCopyStatus(
+        error.response?.data?.error ||
+          "Failed to copy categories. They might already exist or the previous month is empty.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -295,13 +338,24 @@ const Expense = () => {
                 </Button>
               </>
             ) : (
-              <Button
-                onClick={() => setShowCategoryModal(true)}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-500"
-              >
-                <IoAddCircleOutline size={20} />
-                Add Category Spend
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleCopyPreviousMonthCategories}
+                  variant="outline"
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                  disabled={isSubmitting}
+                >
+                  <IoDownloadOutline size={20} className="rotate-180" />
+                  Copy from Past Month
+                </Button>
+                <Button
+                  onClick={() => setShowCategoryModal(true)}
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-500"
+                >
+                  <IoAddCircleOutline size={20} />
+                  Add Category Spend
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -681,6 +735,131 @@ const Expense = () => {
               {isCategorySubmitting ? "Adding..." : "Add Category Spend"}
             </Button>
           </form>
+        </Modal>
+
+        {/* Delete Expense Confirmation Modal */}
+        <Modal
+          isOpen={!!deleteExpenseId}
+          onClose={() => {
+            if (!isDeleting) setDeleteExpenseId(null);
+          }}
+          title="Delete Expense"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-300">
+              Are you sure you want to permanently{" "}
+              <span className="font-semibold text-red-400">delete</span> this
+              expense? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3 mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDeleteExpenseId(null)}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmDeleteExpense}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Delete Category Spend Confirmation Modal */}
+        <Modal
+          isOpen={!!deleteCategoryId}
+          onClose={() => {
+            if (!isDeleting) setDeleteCategoryId(null);
+          }}
+          title="Delete Category Spend"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-300">
+              Are you sure you want to{" "}
+              <span className="font-semibold text-red-400">
+                delete this category spend
+              </span>
+              ? This will remove its budget for the selected month.
+            </p>
+            <div className="flex justify-end gap-3 mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDeleteCategoryId(null)}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmDeleteCategory}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Copy Categories Confirmation Modal */}
+        <Modal
+          isOpen={showCopyModal}
+          onClose={() => {
+            if (!isSubmitting) {
+              setShowCopyModal(false);
+            }
+          }}
+          title="Copy Categories from Previous Month"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-300">
+              This will copy all category budgets from{" "}
+              <span className="font-semibold text-blue-400">
+                {month === 1 ? 12 : month - 1}/{month === 1 ? year - 1 : year}
+              </span>{" "}
+              into{" "}
+              <span className="font-semibold text-blue-400">
+                {month}/{year}
+              </span>
+              . Existing categories in the current month are not allowed.
+            </p>
+
+            {copyStatus && (
+              <div className="text-sm px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200">
+                {copyStatus}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCopyModal(false)}
+                className="px-4"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmCopyPreviousMonthCategories}
+                className="px-4"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Copying..." : "Copy Categories"}
+              </Button>
+            </div>
+          </div>
         </Modal>
       </div>
     </DashboardLayout>

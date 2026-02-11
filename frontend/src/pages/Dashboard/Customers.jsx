@@ -39,6 +39,12 @@ const Customers = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [error, setError] = useState("");
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    type: null, // "pay" | "unpay" | "delete"
+    customerId: null,
+  });
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const fetchCustomers = React.useCallback(async () => {
     try {
@@ -69,43 +75,48 @@ const Customers = () => {
   }, [fetchCustomers]);
 
   const handlePay = async (id) => {
-    if (
-      window.confirm(
-        "Confirm payment for this customer for the selected month?",
-      )
-    ) {
-      try {
-        await customerAPI.pay(id, selectedMonth, selectedYear);
-        fetchCustomers();
-      } catch (error) {
-        console.error("Error processing payment:", error);
-      }
-    }
+    setConfirmModal({
+      open: true,
+      type: "pay",
+      customerId: id,
+    });
   };
 
   const handleUnpay = async (id) => {
-    if (
-      window.confirm(
-        "Are you sure you want to mark this customer as UNPAID for this month? (This will remove the payment from income)",
-      )
-    ) {
-      try {
-        await customerAPI.unpay(id, selectedMonth, selectedYear);
-        fetchCustomers();
-      } catch (error) {
-        console.error("Error reversing payment:", error);
-      }
-    }
+    setConfirmModal({
+      open: true,
+      type: "unpay",
+      customerId: id,
+    });
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to remove this customer?")) {
-      try {
-        await customerAPI.delete(id);
-        fetchCustomers();
-      } catch (error) {
-        console.error("Error deleting customer:", error);
+    setConfirmModal({
+      open: true,
+      type: "delete",
+      customerId: id,
+    });
+  };
+
+  const confirmCustomerAction = async () => {
+    const { type, customerId } = confirmModal;
+    if (!type || !customerId) return;
+
+    try {
+      setIsConfirming(true);
+      if (type === "pay") {
+        await customerAPI.pay(customerId, selectedMonth, selectedYear);
+      } else if (type === "unpay") {
+        await customerAPI.unpay(customerId, selectedMonth, selectedYear);
+      } else if (type === "delete") {
+        await customerAPI.delete(customerId);
       }
+      setConfirmModal({ open: false, type: null, customerId: null });
+      await fetchCustomers();
+    } catch (error) {
+      console.error("Error performing customer action:", error);
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -553,6 +564,75 @@ const Customers = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Confirmation Modal for Customer Actions */}
+      <Modal
+        isOpen={confirmModal.open}
+        onClose={() => {
+          if (!isConfirming) {
+            setConfirmModal({ open: false, type: null, customerId: null });
+          }
+        }}
+        title={
+          confirmModal.type === "pay"
+            ? "Confirm Payment"
+            : confirmModal.type === "unpay"
+              ? "Undo Payment"
+              : "Remove Customer"
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-300">
+            {confirmModal.type === "pay" && (
+              <>
+                Confirm payment for this customer for the selected month (
+                <span className="font-semibold text-blue-400">
+                  {selectedMonth}/{selectedYear}
+                </span>
+                )?
+              </>
+            )}
+            {confirmModal.type === "unpay" && (
+              <>
+                Are you sure you want to mark this customer as{" "}
+                <span className="font-semibold text-red-400">UNPAID</span> for
+                this month? This will remove the payment from income.
+              </>
+            )}
+            {confirmModal.type === "delete" && (
+              <>
+                Are you sure you want to{" "}
+                <span className="font-semibold text-red-400">
+                  remove this customer
+                </span>
+                ? This will delete their subscription record for all months.
+              </>
+            )}
+          </p>
+
+          <div className="flex justify-end gap-3 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                setConfirmModal({ open: false, type: null, customerId: null })
+              }
+              className="px-4"
+              disabled={isConfirming}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmCustomerAction}
+              className="px-4"
+              disabled={isConfirming}
+            >
+              {isConfirming ? "Processing..." : "Confirm"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </DashboardLayout>
   );

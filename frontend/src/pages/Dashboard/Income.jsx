@@ -34,6 +34,8 @@ const Income = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
   const [paginationLoading, setPaginationLoading] = useState(false);
+  const [deleteIncomeId, setDeleteIncomeId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchIncomes = useCallback(async () => {
     try {
@@ -91,14 +93,21 @@ const Income = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this income?")) {
-      try {
-        await API.delete(`/income/${id}`);
-        fetchIncomes();
-      } catch (error) {
-        console.error("Error deleting income:", error);
-      }
+  const handleDelete = (id) => {
+    setDeleteIncomeId(id);
+  };
+
+  const confirmDeleteIncome = async () => {
+    if (!deleteIncomeId) return;
+    try {
+      setIsDeleting(true);
+      await API.delete(`/income/${deleteIncomeId}`);
+      setDeleteIncomeId(null);
+      await fetchIncomes();
+    } catch (error) {
+      console.error("Error deleting income:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -270,6 +279,42 @@ const Income = () => {
               {isSubmitting ? "Adding..." : "Add Income"}
             </Button>
           </form>
+        </Modal>
+
+        {/* Delete Income Confirmation Modal */}
+        <Modal
+          isOpen={!!deleteIncomeId}
+          onClose={() => {
+            if (!isDeleting) setDeleteIncomeId(null);
+          }}
+          title="Delete Income"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-300">
+              Are you sure you want to permanently{" "}
+              <span className="font-semibold text-red-400">delete</span> this
+              income record? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3 mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDeleteIncomeId(null)}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmDeleteIncome}
+                className="px-4"
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
         </Modal>
       </div>
     </DashboardLayout>

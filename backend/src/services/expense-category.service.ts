@@ -188,4 +188,98 @@ export class ExpenseCategoryService {
   async getUniqueCategories(userId: string): Promise<string[]> {
     return await ExpenseCategory.distinct("category", { user: userId });
   }
+
+  async copyFromPreviousMonth(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<IExpenseCategory[]> {
+    // Calculate previous month and year
+    let prevMonth = month - 1;
+    let prevYear = year;
+    if (prevMonth === 0) {
+      prevMonth = 12;
+      prevYear -= 1;
+    }
+
+    // Check if categories already exist for target month
+    const existingCount = await ExpenseCategory.countDocuments({
+      user: userId,
+      month,
+      year,
+    });
+    if (existingCount > 0) {
+      throw new ValidationError("Categories already exist for this month");
+    }
+
+    // Get categories from previous month, if any
+    const prevCategories = await ExpenseCategory.find({
+      user: userId,
+      month: prevMonth,
+      year: prevYear,
+    });
+
+    let result: IExpenseCategory[];
+
+    if (prevCategories.length > 0) {
+      // Copy explicit category buckets but reset amount to 0
+      const newCategories = prevCategories.map((cat) => {
+        const { _id, __v, createdAt, amount, ...rest } = cat.toObject() as any;
+        return {
+          ...rest,
+          amount: 0,
+          month,
+          year,
+        };
+      });
+
+      result = (await ExpenseCategory.insertMany(
+        newCategories,
+      )) as unknown as IExpenseCategory[];
+    } else {
+      // No explicit buckets – fall back to previous month's expenses,
+      // grouping by category and using the total spend as the new bucket amount.
+      const startDate = new Date(prevYear, prevMonth - 1, 1);
+      const endDate = new Date(prevYear, prevMonth, 0, 23, 59, 59, 999);
+
+      const prevExpenses = await Expense.find({
+        user: userId,
+        date: { $gte: startDate, $lte: endDate },
+      });
+
+      if (prevExpenses.length === 0) {
+        throw new NotFoundError(
+          "No categories or expenses found in previous month to copy",
+        );
+      }
+
+      const totalsByCategory = prevExpenses.reduce(
+        (acc: Record<string, number>, exp) => {
+          if (!exp.category) return acc;
+          acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+          return acc;
+        },
+        {},
+      );
+
+      const newCategoriesFromExpenses = Object.entries(totalsByCategory).map(
+        ([category]) => ({
+          user: userId,
+          category,
+          amount: 0,
+          month,
+          year,
+        }),
+      );
+
+      result = (await ExpenseCategory.insertMany(
+        newCategoriesFromExpenses,
+      )) as unknown as IExpenseCategory[];
+    }
+
+    // Trigger summary recalculation for the current month
+    await this.monthlySummaryService.calculate(userId, month, year);
+
+    return result;
+  }
 }

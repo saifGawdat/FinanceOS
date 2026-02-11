@@ -13,6 +13,11 @@ router.get(
 );
 router.get("/unique", auth, expenseCategoryController.getUniqueCategories);
 router.post("/", auth, expenseCategoryController.createExpenseCategory);
+router.post(
+  "/copy-previous",
+  auth,
+  expenseCategoryController.copyPreviousMonthCategories,
+);
 router.put("/:id", auth, expenseCategoryController.updateExpenseCategory);
 router.delete("/:id", auth, expenseCategoryController.deleteExpenseCategory);
 

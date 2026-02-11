@@ -54,7 +54,7 @@ export class IncomeService {
     const totalPages = Math.ceil(totalItems / validatedLimit);
 
     const incomes = await Income.find(query)
-      .sort({ date: -1 })
+      .sort({ date: -1, createdAt: -1 })
       .skip(skip)
       .limit(validatedLimit)
       .lean();

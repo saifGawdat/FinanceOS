@@ -103,4 +103,23 @@ export class ExpenseCategoryController {
       next(error);
     }
   };
+
+  copyPreviousMonthCategories = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const { month, year } = req.body;
+      const categories =
+        await this.expenseCategoryService.copyFromPreviousMonth(
+          req.userId!,
+          parseInt(month),
+          parseInt(year),
+        );
+      res.status(201).json(categories);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

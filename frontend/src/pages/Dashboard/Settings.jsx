@@ -58,6 +58,7 @@ const Settings = () => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [installError, setInstallError] = useState("");
 
   React.useEffect(() => {
     // Check if app is already running in standalone mode
@@ -91,13 +92,15 @@ const Settings = () => {
 
   const installApp = async () => {
     if (!deferredPrompt) {
-      // If prompt isn't available, the user might need to use browser menu
-      alert("Please use your browser's menu (Add to home screen) to install.");
-      setShowInstallModal(false);
+      // If prompt isn't available, show guidance inside the modal
+      setInstallError(
+        "Please use your browser's menu (Add to home screen) to install.",
+      );
       return;
     }
 
     setShowInstallModal(false);
+    setInstallError("");
     deferredPrompt.prompt();
 
     const { outcome } = await deferredPrompt.userChoice;
@@ -181,6 +184,11 @@ const Settings = () => {
             <p className="text-gray-400">
               Are you sure you want to install the app?
             </p>
+            {installError && (
+              <div className="text-sm px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200">
+                {installError}
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <button
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium whitespace-nowrap px-4 py-2"

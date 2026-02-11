@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IoSend, IoClose, IoChatbubbles } from "react-icons/io5";
-import { processAICommand } from "../../api/geminiService";
+import { IoSend, IoClose, IoChatbubbles, IoMic, IoStop } from "react-icons/io5";
+import { processAICommand, transcribeAudio } from "../../api/geminiService";
 import { useAIActions } from "../../hooks/useAIActions";
 
 const AIAssistant = () => {
@@ -13,6 +13,9 @@ const AIAssistant = () => {
   ]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
   const messagesEndRef = useRef(null);
   const { handleAction } = useAIActions();
 
@@ -100,11 +103,72 @@ const AIAssistant = () => {
         ...prev,
         {
           role: "assistant",
-          text: "Sorry, I'm having trouble connecting right now. Please check your API key and internet connection.",
+          text: `Sorry, I'm having trouble connecting: ${error.message}. Please check if the backend is running and your API keys are correct.`,
         },
       ]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+        setIsLoading(true);
+        try {
+          const transcribedText = await transcribeAudio(audioBlob);
+          if (transcribedText) {
+            handleSend(transcribedText);
+          }
+        } catch (error) {
+          console.error("Transcription failed:", error);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              text: "Sorry, I couldn't transcribe your voice. Please try typing.",
+            },
+          ]);
+        } finally {
+          setIsLoading(false);
+        }
+
+        // Stop all tracks to release the microphone
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: "I couldn't access your microphone. Please check browser permissions and try again.",
+        },
+      ]);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
   };
 
@@ -178,12 +242,25 @@ const AIAssistant = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend(inputText)}
-                placeholder="Type a command..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-blue-500/50 transition-all font-display"
+                placeholder={isRecording ? "Listening..." : "Type a command..."}
+                className={`flex-1 bg-white/5 border ${isRecording ? "border-red-500/50" : "border-white/10"} rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-blue-500/50 transition-all font-display`}
+                disabled={isRecording}
               />
               <button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isLoading}
+                className={`p-3 rounded-xl transition-all ${
+                  isRecording
+                    ? "bg-red-600 hover:bg-red-500 text-white animate-pulse"
+                    : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
+                }`}
+                title={isRecording ? "Stop Recording" : "Voice Command"}
+              >
+                {isRecording ? <IoStop size={20} /> : <IoMic size={20} />}
+              </button>
+              <button
                 onClick={() => handleSend(inputText)}
-                disabled={!inputText.trim() || isLoading}
+                disabled={!inputText.trim() || isLoading || isRecording}
                 className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <IoSend size={20} />

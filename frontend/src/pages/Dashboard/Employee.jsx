@@ -34,6 +34,9 @@ const Employee = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
+  const [deleteEmployeeId, setDeleteEmployeeId] = useState(null);
+  const [deleteTransactionId, setDeleteTransactionId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // حالة الترقيم (Pagination State)
   // Pagination state
@@ -126,19 +129,8 @@ const Employee = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this employee?")) {
-      try {
-        await deleteEmployee(id);
-        // العودة إلى الصفحة الأولى بعد حذف موظف
-        // Return to first page after deleting employee
-        setCurrentPage(1);
-        fetchEmployees();
-      } catch (error) {
-        console.error("Error deleting employee:", error);
-        setError("Failed to delete employee");
-      }
-    }
+  const handleDelete = (id) => {
+    setDeleteEmployeeId(id);
   };
 
   const handleAddNew = () => {
@@ -163,6 +155,7 @@ const Employee = () => {
     amount: "",
     description: "",
   });
+  const [adjustmentsError, setAdjustmentsError] = useState("");
 
   const months = [
     "January",
@@ -208,23 +201,47 @@ const Employee = () => {
         amount: "",
         description: "",
       });
+      setAdjustmentsError("");
       await fetchTransactions();
     } catch (error) {
       console.error("Error adding transaction:", error);
-      alert("Failed to add transaction");
+      setAdjustmentsError("Failed to add transaction. Please try again.");
     } finally {
       setIsAddingTransaction(false);
     }
   };
 
-  const handleDeleteTransaction = async (id) => {
-    if (window.confirm("Delete this adjustment?")) {
-      try {
-        await deleteTransaction(id);
-        fetchTransactions();
-      } catch (error) {
-        console.error("Error deleting transaction:", error);
-      }
+  const handleDeleteTransaction = (id) => {
+    setDeleteTransactionId(id);
+  };
+
+  const confirmDeleteEmployee = async () => {
+    if (!deleteEmployeeId) return;
+    try {
+      setIsDeleting(true);
+      await deleteEmployee(deleteEmployeeId);
+      setDeleteEmployeeId(null);
+      setCurrentPage(1);
+      await fetchEmployees();
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      setError("Failed to delete employee");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const confirmDeleteTransaction = async () => {
+    if (!deleteTransactionId) return;
+    try {
+      setIsDeleting(true);
+      await deleteTransaction(deleteTransactionId);
+      setDeleteTransactionId(null);
+      await fetchTransactions();
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -803,6 +820,11 @@ const Employee = () => {
                       Add Adjustment
                     </h3>
                     <form onSubmit={handleAddTransaction}>
+                      {adjustmentsError && (
+                        <div className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                          {adjustmentsError}
+                        </div>
+                      )}
                       <div className="mb-4">
                         <label className="block text-xs font-bold text-gray-400 mb-2 ml-1">
                           Employee
@@ -954,6 +976,79 @@ const Employee = () => {
           </div>
         )}
       </div>
+      {/* Delete Employee Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteEmployeeId}
+        onClose={() => {
+          if (!isDeleting) setDeleteEmployeeId(null);
+        }}
+        title="Delete Employee"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-300">
+            Are you sure you want to{" "}
+            <span className="font-semibold text-red-400">delete</span> this
+            employee and their salary data? This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-3 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteEmployeeId(null)}
+              className="px-4"
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmDeleteEmployee}
+              className="px-4"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Adjustment Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteTransactionId}
+        onClose={() => {
+          if (!isDeleting) setDeleteTransactionId(null);
+        }}
+        title="Delete Adjustment"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-300">
+            Are you sure you want to{" "}
+            <span className="font-semibold text-red-400">
+              remove this salary adjustment
+            </span>
+            ?
+          </p>
+          <div className="flex justify-end gap-3 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTransactionId(null)}
+              className="px-4"
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmDeleteTransaction}
+              className="px-4"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </DashboardLayout>
   );
 };

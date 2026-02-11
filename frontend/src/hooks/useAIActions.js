@@ -23,17 +23,17 @@ export const useAIActions = () => {
             const endpoint = args.type === "income" ? "/income" : "/expense";
             const payload = {
               title: args.title,
-              amount: args.amount,
+              amount: Number(args.amount),
               category: args.category,
               date: args.date || new Date().toISOString().split("T")[0],
               description: args.description || "",
             };
             await API.post(endpoint, payload);
 
-            // Refresh current page if it might be affected
-            // Simplified: refresh the window or just rely on navigation to update state if we navigate away and back
-            // For better UX, we'd use a global state or a refresh event
-            window.dispatchEvent(new CustomEvent("refreshData"));
+            // Wait a small bit for backend summaries to update
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent("refreshData"));
+            }, 300);
 
             return `Successfully added ${args.type}: ${args.title} for ${args.amount}`;
           } catch (error) {
