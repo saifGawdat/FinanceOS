@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, Part } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Groq } from "groq-sdk";
 import fs from "fs";
 
@@ -24,9 +24,7 @@ export class AIService {
     }
 
     // Initialize a client per key for simple round-robin load balancing
-    this.genAIClients = geminiApiKeys.map(
-      (key) => new GoogleGenerativeAI(key),
-    );
+    this.genAIClients = geminiApiKeys.map((key) => new GoogleGenerativeAI(key));
     this.groq = new Groq({ apiKey: groqApiKey });
   }
 
@@ -150,7 +148,7 @@ export class AIService {
     ];
 
     let lastError: any = null;
-    
+
     for (const modelName of modelsToTry) {
       try {
         console.log(`AIService: Trying model ${modelName}...`);
