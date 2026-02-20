@@ -52,10 +52,10 @@ app.get("/api/debug/test-gemini", async (_req, res) => {
     const result = await model.generateContent("Say 'API is working'");
     const text = result.response.text();
 
-    res.json({ success: true, message: text });
+    return res.json({ success: true, message: text });
   } catch (error: any) {
     console.error("Gemini API test error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: error.message,
       details: error.errorDetails || error.response?.data,
     });
