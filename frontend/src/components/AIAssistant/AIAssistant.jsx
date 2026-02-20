@@ -74,7 +74,7 @@ const AIAssistant = () => {
               {
                 functionResponse: {
                   name: result.name,
-                  response: { content: actionResult },
+                  response: { name: result.name, content: actionResult },
                 },
               },
             ],

@@ -3,30 +3,77 @@ import { AIService } from "../services/ai.service";
 import { ExpenseCategoryService } from "../services/expense-category.service";
 import fs from "fs";
 
-const aiService = new AIService();
-const expenseCategoryService = new ExpenseCategoryService();
+let aiService: AIService | null = null;
 
-export const chat = async (req: Request, res: Response, next: NextFunction) => {
+function getAIService() {
+  if (!aiService) {
+    aiService = new AIService();
+  }
+  return aiService;
+}
+
+export const chat = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   try {
     const { command, history } = req.body;
+    console.log("\n=== AI CHAT REQUEST START ===");
+    console.dir(req.body, { depth: null, colors: true });
+    console.log("Command:", command);
+    console.log("UserId:", req.userId);
+    console.log("History length:", history?.length || 0);
+
     if (!command) {
       return res.status(400).json({ error: "Command is required" });
     }
 
-    // Pass user's categories to AI for smarter mapping
+    console.log("Step 1: Getting AI Service...");
+    const aiService = getAIService();
+    console.log("Step 2: AI Service obtained");
+
+    console.log("Step 3: Creating ExpenseCategoryService...");
+    let expenseCategoryService: any;
+    try {
+      expenseCategoryService = new ExpenseCategoryService();
+      console.log("Step 4: ExpenseCategoryService created");
+    } catch (serviceError: any) {
+      console.error(
+        "ERROR creating ExpenseCategoryService:",
+        serviceError.message,
+      );
+      throw serviceError;
+    }
+
+    console.log("Step 5: Fetching categories for user:", req.userId);
     const categories = await expenseCategoryService.getUniqueCategories(
       req.userId!,
     );
+    console.log("Step 6: Categories fetched:", categories.length, "categories");
+    console.log("Categories:", categories);
 
+    console.log("Step 7: Calling aiService.processChat");
     const result = await aiService.processChat(
       command,
       history || [],
       categories,
     );
+    console.log("Step 8: AI Response generated successfully");
+    console.log("Response type:", result.type);
+    console.log("=== AI CHAT REQUEST END (SUCCESS) ===\n");
     return res.json(result);
   } catch (error: any) {
-    console.error("Backend AI Chat Error:", error.message, error.stack);
-    return next(error);
+    console.error("\n!!! AI CHAT ERROR !!!");
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    console.error("Full error:", error);
+    console.error("=== AI CHAT REQUEST END (ERROR) ===\n");
+    return res.status(500).json({
+      error: "AI Service Error",
+      message: error.message,
+      stack: error.stack,
+    });
   }
 };
 
@@ -40,6 +87,7 @@ export const transcribe = async (
       return res.status(400).json({ error: "No audio file provided" });
     }
 
+    const aiService = getAIService();
     const text = await aiService.transcribeAudio(req.file.path);
 
     // Clean up uploaded file after transcription

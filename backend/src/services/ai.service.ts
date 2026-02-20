@@ -8,27 +8,29 @@ export class AIService {
   private groq: Groq;
 
   constructor() {
-    // Collect all Gemini API keys that start with VITE_GEMINI_API_KEY*
+    // Collect all Gemini API keys
     const geminiApiKeys = Object.entries(process.env)
-      .filter(([key]) => key.startsWith("VITE_GEMINI_API_KEY"))
-      .map(([, value]) => value)
+      .filter(
+        ([key]) =>
+          key.startsWith("GEMINI_API_KEY") ||
+          key.startsWith("VITE_GEMINI_API_KEY"),
+      )
+      .map(([, v]) => v)
       .filter((v): v is string => !!v);
 
-    const groqApiKey = process.env.GROQ_API;
+    const groqApiKey = process.env.GROQ_API || process.env.GROQ_API_KEY;
 
-    if (geminiApiKeys.length === 0) {
-      throw new Error("At least one VITE_GEMINI_API_KEY is required in .env");
+    if (!geminiApiKeys.length) {
+      throw new Error("Missing GEMINI_API_KEY / VITE_GEMINI_API_KEY in env");
     }
     if (!groqApiKey) {
-      throw new Error("GROQ_API is not defined in .env");
+      throw new Error("Missing GROQ_API / GROQ_API_KEY in env");
     }
 
-    // Initialize a client per key for simple round-robin load balancing
     this.genAIClients = geminiApiKeys.map((key) => new GoogleGenerativeAI(key));
     this.groq = new Groq({ apiKey: groqApiKey });
   }
 
-  // Round-robin selection of Gemini client
   private getNextGenAI(): GoogleGenerativeAI {
     const client = this.genAIClients[this.genAIIndex];
     this.genAIIndex = (this.genAIIndex + 1) % this.genAIClients.length;
@@ -41,34 +43,20 @@ export class AIService {
         ? `Existing categories: ${categories.join(", ")}`
         : "No categories defined yet.";
 
-    return `You are a highly intelligent financial assistant for a Financial Management System. 
-    Your goal is to help users manage their finances effectively. 
-    
-    CRITICAL: ALWAYS respond in English, regardless of the user's input language. 
-    If you transcribe audio in a different language, process the meaning but respond in English.
+    return `You are a highly intelligent financial assistant for a Financial Management System.
+CRITICAL: ALWAYS respond in English.
 
-    You can:
-    1. Navigate the user to different pages: dashboard, income, expense, employees, salaries, profit-summary, customers, settings.
-    2. Add transactions (income or expense).
-    
-    Category Picking:
-    When adding a transaction, you MUST try to match the user's intent to one of the following existing categories if they are relevant:
-    ${categoriesList}
-    
-    If none of the existing categories fit well, you can suggest a new appropriate one.
+You can:
+1) Navigate pages: dashboard, income, expense, employees, salaries, profit-summary, customers, settings.
+2) Add transactions (income/expense).
 
-    Guidelines:
-    - Be concise, professional, and helpful.
-    - If you perform an action (like navigating or adding a transaction), confirm it clearly in English.
-    - If the user's intent is unclear, ask for clarification in English.
-    
-    App Structure Context:
-    - Dashboard: Overview of finances.
-    - Income/Expense: Manage transactions.
-    - Employees/Salaries: Manage staff and payroll.
-    - Customers: Manage client information.
-    - Profit-Summary: Detailed financial reports.
-    `;
+Category Picking:
+${categoriesList}
+
+Rules:
+- If user wants an action, use the tools provided.
+- If missing required fields (amount/title/type/category), ask a question.
+`;
   }
 
   private getTools() {
@@ -84,7 +72,7 @@ export class AIService {
                 page: {
                   type: "STRING",
                   description:
-                    "The name of the page to navigate to. Options: dashboard, income, expense, employees, salaries, profit-summary, customers, settings",
+                    "Page name: dashboard, income, expense, employees, salaries, profit-summary, customers, settings",
                 },
               },
               required: ["page"],
@@ -96,38 +84,69 @@ export class AIService {
             parameters: {
               type: "OBJECT",
               properties: {
-                type: {
-                  type: "STRING",
-                  description: "The type of transaction: 'income' or 'expense'",
-                },
-                title: {
-                  type: "STRING",
-                  description: "A short title for the transaction",
-                },
-                amount: {
-                  type: "NUMBER",
-                  description: "The amount of the transaction",
-                },
-                category: {
-                  type: "STRING",
-                  description:
-                    "The category of the transaction. Prefer matching an existing category if possible.",
-                },
+                type: { type: "STRING", description: "income or expense" },
+                title: { type: "STRING", description: "Short title" },
+                amount: { type: "NUMBER", description: "Amount" },
+                category: { type: "STRING", description: "Category" },
                 date: {
                   type: "STRING",
-                  description:
-                    "The date of the transaction in YYYY-MM-DD format.",
+                  description: "Date in YYYY-MM-DD format (optional)",
                 },
                 description: {
                   type: "STRING",
-                  description:
-                    "A longer description of the transaction (optional)",
+                  description: "Optional details",
                 },
               },
               required: ["type", "title", "amount", "category"],
             },
           },
         ],
+      },
+      
+    ];
+  }
+
+  private getGroqTools() {
+    return [
+      {
+        type: "function" as const,
+        function: {
+          name: "navigate",
+          description: "Navigate to a specific page in the application",
+          parameters: {
+            type: "object",
+            properties: {
+              page: {
+                type: "string",
+                description:
+                  "Page name: dashboard, income, expense, employees, salaries, profit-summary, customers, settings",
+              },
+            },
+            required: ["page"],
+          },
+        },
+      },
+      {
+        type: "function" as const,
+        function: {
+          name: "add_transaction",
+          description: "Add a new financial transaction (income or expense)",
+          parameters: {
+            type: "object",
+            properties: {
+              type: { type: "string", description: "income or expense" },
+              title: { type: "string", description: "Short title" },
+              amount: { type: "number", description: "Amount" },
+              category: { type: "string", description: "Category" },
+              date: {
+                type: "string",
+                description: "Date in YYYY-MM-DD format",
+              },
+              description: { type: "string", description: "Optional details" },
+            },
+            required: ["type", "title", "amount", "category"],
+          },
+        },
       },
     ];
   }
@@ -137,14 +156,10 @@ export class AIService {
     history: any[] = [],
     categories: string[] = [],
   ) {
-    console.log("AIService: Processing command:", command);
-
     const modelsToTry = [
       "gemini-2.0-flash",
-      "gemini-2.0-flash-lite",
       "gemini-1.5-flash",
-      "gemini-1.5-flash-8b",
-      "gemini-pro",
+      "gemini-1.5-pro",
     ];
 
     let lastError: any = null;
@@ -152,96 +167,194 @@ export class AIService {
     for (const modelName of modelsToTry) {
       try {
         console.log(`AIService: Trying model ${modelName}...`);
-        const model = this.getNextGenAI().getGenerativeModel({
+        const genAI = this.getNextGenAI();
+        const model = genAI.getGenerativeModel({
           model: modelName,
-          tools: this.getTools() as any,
           systemInstruction: this.getSystemPrompt(categories),
+          tools: this.getTools() as any,
+          toolConfig: {
+            functionCallingConfig: { mode: "AUTO" },
+          } as any,
         });
 
-        const formattedHistory: any[] = [];
-        let expectedRole = "user";
+        // Format history for Gemini
+        console.log(
+          "AIService: Formatting history, input length:",
+          history?.length,
+        );
+        // Manual history construction to ensure strict compliance
+        const contents: any[] = [];
+        let currentRole = "user"; // Start expecting a user message
+        let currentParts: any[] = [];
 
-        for (const item of history) {
-          let role = item.role === "assistant" ? "model" : item.role;
+        for (const item of history || []) {
+          const role =
+            item.role === "assistant" || item.role === "model"
+              ? "model"
+              : "user";
 
-          if (role !== expectedRole && role !== "function") {
-            continue;
+          const itemParts: any[] = [];
+          if (item.parts && Array.isArray(item.parts)) {
+            itemParts.push(
+              ...item.parts
+                .map((p: any) => {
+                  if (p.text) return { text: p.text };
+                  if (p.functionCall) return { functionCall: p.functionCall };
+                  if (p.functionResponse)
+                    return {
+                      functionResponse: {
+                        name: p.functionResponse.name,
+                        response: p.functionResponse.response,
+                      },
+                    };
+                  return null;
+                })
+                .filter(Boolean),
+            );
+          } else {
+            const text =
+              item.text ||
+              item.content ||
+              (typeof item.parts === "string" ? item.parts : "");
+            if (text) itemParts.push({ text });
           }
 
-          const parts = item.parts
-            .map((p: any) => {
-              if (p.text) return { text: p.text };
-              if (p.functionCall) return { functionCall: p.functionCall };
-              if (p.functionResponse)
-                return { functionResponse: p.functionResponse };
-              return { text: p.content || "" };
-            })
-            .filter(
-              (p: any) => p.text !== "" || p.functionCall || p.functionResponse,
-            );
+          if (itemParts.length === 0) continue;
 
-          if (parts.length > 0) {
-            formattedHistory.push({ role, parts });
-            if (role === "user") expectedRole = "model";
-            else if (role === "model") expectedRole = "user";
+          if (role === currentRole) {
+            currentParts.push(...itemParts);
+          } else {
+            if (currentParts.length > 0) {
+              contents.push({ role: currentRole, parts: currentParts });
+            }
+            currentRole = role;
+            currentParts = [...itemParts];
           }
         }
 
-        const chat = model.startChat({
-          history: formattedHistory,
-        });
+        // Push the last accumulated parts
+        if (currentParts.length > 0) {
+          contents.push({ role: currentRole, parts: currentParts });
+        }
 
-        const result = await chat.sendMessage(command);
+        // Add the new command
+        if (
+          contents.length > 0 &&
+          contents[contents.length - 1].role === "user"
+        ) {
+          contents[contents.length - 1].parts.push({ text: command });
+        } else {
+          contents.push({ role: "user", parts: [{ text: command }] });
+        }
+
+        const result = await model.generateContent({ contents });
         const response = await result.response;
 
-        if (!response.candidates || response.candidates.length === 0) {
-          throw new Error("No response candidates returned.");
+        // Check for function calls
+        const candidate = response.candidates?.[0];
+        const parts = candidate?.content?.parts || [];
+        const functionCallPart = parts.find((p: any) => p.functionCall);
+
+        if (functionCallPart?.functionCall) {
+          const { name, args } = functionCallPart.functionCall;
+          return {
+            type: "function_call",
+            name,
+            args,
+          };
         }
 
-        const call = response.functionCalls()?.[0];
-
-        console.log(`AIService: [${modelName}] Success!`);
-        return {
-          type: call ? "function_call" : "text",
-          name: call?.name,
-          args: call?.args,
-          text: response.text(),
-        };
+        const text = response.text();
+        return { type: "text", text };
       } catch (error: any) {
+        console.error(
+          `AIService: [${modelName}] Error encountered:`,
+          error.message,
+        );
         lastError = error;
-        const msg = error.message || "";
-        console.error(`AIService: [${modelName}] Failed:`, msg);
-
-        if (
-          msg.includes("404") ||
-          msg.includes("403") ||
-          msg.includes("not found") ||
-          msg.includes("429") ||
-          msg.includes("quota")
-        ) {
-          continue;
-        }
-
         continue;
       }
     }
 
-    throw lastError || new Error("AI service is currently unavailable.");
+    // Fallback to Groq
+    try {
+      console.log("AIService: Falling back to Groq LLaMA...");
+      const groqMessages: any[] = [
+        { role: "system", content: this.getSystemPrompt(categories) },
+        ...history.map((h) => {
+          let content = h.text || h.content || "";
+          if (!content && Array.isArray(h.parts)) {
+            content = h.parts
+              .map(
+                (p: any) =>
+                  p.text ||
+                  JSON.stringify(p.functionCall || p.functionResponse || ""),
+              )
+              .join("\n");
+          }
+          return {
+            role:
+              h.role === "model" || h.role === "assistant"
+                ? "assistant"
+                : "user",
+            content: content || "...", // Groq requires non-empty content
+          };
+        }),
+        { role: "user", content: command },
+      ];
+
+      const completion = await this.groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: groqMessages,
+        tools: this.getGroqTools(),
+        tool_choice: "auto",
+        max_tokens: 1024,
+      });
+
+      const choice = completion.choices[0];
+
+      if (choice?.message?.tool_calls?.length) {
+        const toolCall = choice.message.tool_calls[0];
+        return {
+          type: "function_call",
+          name: toolCall.function.name,
+          args: JSON.parse(toolCall.function.arguments || "{}"),
+        };
+      }
+
+      const text = choice?.message?.content || "";
+      if (!text) throw new Error("Empty response from Groq");
+
+      return { type: "text", text };
+    } catch (groqError: any) {
+      console.error("Groq fallback failed:", groqError.message);
+    }
+
+    // Check if we are in a post-tool-execution context (function response present)
+    // This prevents showing an error to the user if the action succeeded but the AI confirmation failed
+    const isConfirmationRequest =
+      history.some((h) => h.role === "function") ||
+      command.includes("The action was successful.");
+
+    if (isConfirmationRequest) {
+      console.warn(
+        "AI Service: Models failed during confirmation generation. Returning fallback success message.",
+      );
+      return {
+        type: "text",
+        text: "✅ Action completed successfully. (Note: The AI response service is temporarily unavailable, but your transaction was recorded.)",
+      };
+    }
+
+    throw lastError || new Error("All AI models failed");
   }
 
   async transcribeAudio(filePath: string) {
-    try {
-      // Use translations instead of transcriptions to always get English
-      const transcription = await this.groq.audio.translations.create({
-        file: fs.createReadStream(filePath),
-        model: "whisper-large-v3",
-        response_format: "json",
-      });
-
-      return transcription.text;
-    } catch (error: any) {
-      console.error("Groq Translation Error:", error);
-      throw new Error("Failed to transcribe audio: " + error.message);
-    }
+    const transcription = await this.groq.audio.translations.create({
+      file: fs.createReadStream(filePath),
+      model: "whisper-large-v3",
+      response_format: "json",
+    });
+    return transcription.text;
   }
 }

@@ -29,3 +29,6 @@ Thumbs.db
 
 #AI
 .agent
+
+# IDE history
+.history/

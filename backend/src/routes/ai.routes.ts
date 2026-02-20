@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as aiController from "../controllers/ai.controller";
 import multer from "multer";
 import path from "path";
+import { auth } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -19,7 +20,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Routes
-router.post("/chat", aiController.chat);
-router.post("/transcribe", upload.single("audio"), aiController.transcribe);
+router.post("/chat", auth, aiController.chat);
+router.post(
+  "/transcribe",
+  auth,
+  upload.single("audio"),
+  aiController.transcribe,
+);
 
 export default router;

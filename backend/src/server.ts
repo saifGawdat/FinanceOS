@@ -19,19 +19,51 @@ app.use(
 );
 app.use(express.json());
 
+// Set COOP header for Google Auth
+app.use((_req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
 // Request logger
 app.use((req, _res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-// Routes
-app.use("/api", routes);
-
 // Health check route
 app.get("/", (_req, res) => {
   res.json({ message: "Expense Tracker API is running" });
 });
+
+// Debug: Test API key
+app.get("/api/debug/test-gemini", async (_req, res) => {
+  try {
+    const { GoogleGenerativeAI } = require("@google/generative-ai");
+    const apiKey = process.env.VITE_GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(400).json({ error: "VITE_GEMINI_API_KEY not set" });
+    }
+
+    const client = new GoogleGenerativeAI(apiKey);
+    const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const result = await model.generateContent("Say 'API is working'");
+    const text = result.response.text();
+
+    res.json({ success: true, message: text });
+  } catch (error: any) {
+    console.error("Gemini API test error:", error);
+    res.status(500).json({
+      error: error.message,
+      details: error.errorDetails || error.response?.data,
+    });
+  }
+});
+
+// Routes
+app.use("/api", routes);
 
 // 404 Handler
 app.use((req, res) => {
