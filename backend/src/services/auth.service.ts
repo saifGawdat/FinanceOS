@@ -114,6 +114,21 @@ export class AuthService {
     return user;
   }
 
+  async updateProfile(
+    userId: string,
+    data: { phoneNumber?: string; name?: string },
+  ): Promise<IUser> {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+    if (data.phoneNumber !== undefined) user.phoneNumber = data.phoneNumber;
+    if (data.name !== undefined) user.name = data.name;
+    await user.save();
+    const updated = await User.findById(userId).select("-password");
+    return updated!;
+  }
+
   async deleteAccount(userId: string): Promise<void> {
     const user = await User.findById(userId);
     if (!user) {

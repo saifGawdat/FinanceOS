@@ -36,4 +36,6 @@ router.delete("/delete-account", auth, authController.deleteAccount);
 
 router.get("/me", auth, authController.getMe);
 
+router.patch("/profile", auth, authController.updateProfile);
+
 export default router;

@@ -8,10 +8,12 @@ import {
   IoWarningOutline,
   IoCheckmarkCircle,
   IoDownloadOutline,
+  IoPhonePortraitOutline,
+  IoSaveOutline,
 } from "react-icons/io5";
 
 const Settings = () => {
-  const { deleteAccount } = useAuth();
+  const { deleteAccount, updateProfile, user } = useAuth();
   const navigate = useNavigate();
 
   // Delete account state
@@ -20,6 +22,27 @@ const Settings = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+  // Phone number / profile state
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
+  const [isSavingPhone, setIsSavingPhone] = useState(false);
+  const [phoneSaved, setPhoneSaved] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
+
+  const handleSavePhone = async () => {
+    setIsSavingPhone(true);
+    setPhoneError("");
+    setPhoneSaved(false);
+    try {
+      await updateProfile({ phoneNumber: phoneNumber.trim() });
+      setPhoneSaved(true);
+      setTimeout(() => setPhoneSaved(false), 3000);
+    } catch {
+      setPhoneError("Failed to save phone number. Please try again.");
+    } finally {
+      setIsSavingPhone(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return;
@@ -118,6 +141,59 @@ const Settings = () => {
           </h1>
           <p className="text-gray-400 mt-1">Manage your account settings</p>
         </div>
+
+        {/* Profile Section */}
+        <section className="mb-6 bg-[#1a1d24] rounded-2xl shadow-xl p-6 border border-white/8">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 bg-green-500/10 rounded-lg">
+              <IoPhonePortraitOutline className="text-green-400" size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-100">Profile</h2>
+              <p className="text-sm text-gray-400">Your contact info used for WhatsApp</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Your WhatsApp Phone Number
+              </label>
+              <div className="flex gap-3">
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="e.g. +201234567890"
+                  className="flex-1 px-4 py-3 bg-white/3 border border-white/10 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:border-green-500/50 transition-all"
+                />
+                <button
+                  onClick={handleSavePhone}
+                  disabled={isSavingPhone}
+                  className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium whitespace-nowrap"
+                >
+                  <IoSaveOutline size={18} />
+                  {isSavingPhone ? "Saving..." : "Save"}
+                </button>
+              </div>
+
+              {phoneSaved && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-green-400 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-xl">
+                  <IoCheckmarkCircle size={16} />
+                  Phone number saved successfully!
+                </div>
+              )}
+              {phoneError && (
+                <div className="mt-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl">
+                  {phoneError}
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-2">
+                Include country code (e.g. +20 for Egypt). This number will be used when you click WhatsApp on customer cards.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Danger Zone Section */}
         <section className="bg-[#1a1d24] rounded-2xl shadow-xl p-6 border border-red-500/20">

@@ -12,6 +12,7 @@ import {
   IoCloseCircleOutline,
   IoDownloadOutline,
   IoPencilOutline,
+  IoLogoWhatsapp,
 } from "react-icons/io5";
 import * as XLSX from "xlsx";
 
@@ -398,6 +399,15 @@ const Customers = () => {
                           <span>Undo</span>
                         </Button>
                       )}
+                      <a
+                        href={`https://wa.me/${customer.phoneNumber.replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 text-gray-500 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition-all"
+                        title="Message on WhatsApp"
+                      >
+                        <IoLogoWhatsapp size={20} />
+                      </a>
                       <button
                         onClick={() => handleEdit(customer)}
                         className="p-2 text-gray-500 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all"

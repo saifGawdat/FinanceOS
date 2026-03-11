@@ -56,6 +56,19 @@ export class AuthController {
     }
   };
 
+  updateProfile = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const user = await this.authService.updateProfile(req.userId!, req.body);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   deleteAccount = async (
     req: Request,
     res: Response,

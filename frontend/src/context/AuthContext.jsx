@@ -72,6 +72,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data) => {
+    const res = await API.patch("/auth/profile", data);
+    setUser(res.data);
+    return res.data;
+  };
+
   const value = {
     user,
     login,
@@ -79,6 +85,7 @@ export const AuthProvider = ({ children }) => {
     googleLogin,
     logout,
     deleteAccount,
+    updateProfile,
     isAuthenticated: !!user,
     loading,
   };
