@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import SummaryCard from "../../components/dashboard/SummaryCard";
 import RecentTransactions from "../../components/dashboard/RecentTransactions";
@@ -7,7 +7,11 @@ import PieChart from "../../components/charts/PieChart";
 import LineChart from "../../components/charts/LineChart";
 import Card from "../../components/ui/Card";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
-import API from "../../api/axios";
+import { 
+  useGetDashboardStats, 
+  useGetDashboardCharts, 
+  useGetDashboardRecent 
+} from "../../hooks/queries/useDashboard";
 import {
   IoWalletOutline,
   IoTrendingUpOutline,
@@ -18,62 +22,28 @@ const Home = () => {
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
-  const [stats, setStats] = useState({
-    totalIncome: 0,
-    totalExpense: 0,
-    balance: 0,
-  });
-  const [chartData, setChartData] = useState({
-    barChartData: [],
-    pieChartData: [],
-    lineChartData: [],
-  });
-  const [recentTransactions, setRecentTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = useCallback(async () => {
-    try {
-      // Only set loading if manually requested or first fetch
-      const params = { month, year };
-      const [statsRes, chartRes, recentRes] = await Promise.all([
-        API.get("/dashboard/stats", { params }),
-        API.get("/dashboard/chart-data", { params }),
-        API.get("/dashboard/recent", { params }),
-      ]);
+  const { data: statsData, isLoading: isLoadingStats } = useGetDashboardStats(month, year);
+  const { data: chartDataData, isLoading: isLoadingCharts } = useGetDashboardCharts(month, year);
+  const { data: recentTransactionsData, isLoading: isLoadingRecent } = useGetDashboardRecent(month, year);
 
-      // Batch state updates if possible, or just let React handle them
-      setStats(statsRes.data);
-      setChartData(chartRes.data);
-      setRecentTransactions(recentRes.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      setLoading(false);
-    }
-  }, [month, year]);
+  const loading = isLoadingStats || isLoadingCharts || isLoadingRecent;
+
+  const stats = statsData || { totalIncome: 0, totalExpense: 0, balance: 0 };
+  const chartData = chartDataData || { barChartData: [], pieChartData: [], lineChartData: [] };
+  const recentTransactions = recentTransactionsData || [];
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadData = async () => {
-      if (isMounted) {
-        await fetchDashboardData();
-      }
-    };
-
-    loadData();
-
-    // Listen for AI-triggered refreshes
+    // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
     const handleRefresh = () => {
-      if (isMounted) fetchDashboardData();
+       // React Query refetches automatically on invalidation
     };
     window.addEventListener("refreshData", handleRefresh);
 
     return () => {
-      isMounted = false;
       window.removeEventListener("refreshData", handleRefresh);
     };
-  }, [fetchDashboardData]);
+  }, []);
 
   if (loading) {
     return (

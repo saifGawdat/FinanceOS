@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
@@ -6,18 +6,17 @@ import Button from "../../components/ui/Button";
 import TransactionList from "../../components/dashboard/TransactionList";
 import Modal from "../../components/ui/Modal";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
-import API from "../../api/axios";
+import { useGetIncomes, useAddIncome, useDeleteIncome } from "../../hooks/queries/useIncome";
 import { formatCurrency } from "../../utils/formatters";
-import { getIncomes } from "../../api/income";
 import { exportIncomeToExcel } from "../../utils/exportToExcel";
 import { IoAddCircleOutline, IoDownloadOutline } from "react-icons/io5";
 
 const Income = () => {
   const currentDate = new Date();
-  const [incomes, setIncomes] = useState([]);
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -25,90 +24,79 @@ const Income = () => {
     date: new Date().toISOString().split("T")[0],
     description: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // حالات الترقيم - Pagination states
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
-  const [paginationLoading, setPaginationLoading] = useState(false);
   const [deleteIncomeId, setDeleteIncomeId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchIncomes = useCallback(async () => {
-    try {
-      if (currentPage === 1) {
-        setLoading(true);
-      } else {
-        setPaginationLoading(true);
-      }
+  // Queries
+  const { data: incomesData, isLoading: loading, isFetching: paginationLoading } = useGetIncomes({
+    month,
+    year,
+    page: currentPage,
+    limit: itemsPerPage
+  });
 
-      const response = await getIncomes(month, year, currentPage, itemsPerPage);
+  const incomes = incomesData?.data || [];
+  const totalPages = incomesData?.pagination?.totalPages || 1;
+  const totalItems = incomesData?.pagination?.totalItems || 0;
 
-      setIncomes(response.data);
-      setTotalPages(response.pagination.totalPages);
-      setTotalItems(response.pagination.totalItems);
-    } catch (error) {
-      console.error("Error fetching incomes:", error);
-    } finally {
-      setLoading(false);
-      setPaginationLoading(false);
-    }
-  }, [month, year, currentPage, itemsPerPage]);
+  // Mutations
+  const addIncomeMutation = useAddIncome();
+  const deleteIncomeMutation = useDeleteIncome();
+
+  const isSubmitting = addIncomeMutation.isPending;
+  const isDeleting = deleteIncomeMutation.isPending;
 
   useEffect(() => {
-    fetchIncomes();
-
-    // Listen for AI-triggered refreshes
-    window.addEventListener("refreshData", fetchIncomes);
-    return () => window.removeEventListener("refreshData", fetchIncomes);
-  }, [fetchIncomes]);
+    // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
+    const refreshData = () => {
+       // React Query automatically handles refetching on invalidation
+    };
+    window.addEventListener("refreshData", refreshData);
+    return () => window.removeEventListener("refreshData", refreshData);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await API.post("/income", formData);
-      setIsModalOpen(false);
-      setFormData({
-        title: "",
-        amount: "",
-        category: "",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-      });
-      setCurrentPage(1); // العودة للصفحة الأولى بعد الإضافة
-      await fetchIncomes();
-    } catch (error) {
-      console.error("Error adding income:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    addIncomeMutation.mutate(formData, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setFormData({
+          title: "",
+          amount: "",
+          category: "",
+          date: new Date().toISOString().split("T")[0],
+          description: "",
+        });
+        setCurrentPage(1);
+      },
+      onError: (err) => {
+        console.error("Error adding income:", err);
+      }
+    });
   };
 
   const handleDelete = (id) => {
     setDeleteIncomeId(id);
   };
 
-  const confirmDeleteIncome = async () => {
+  const confirmDeleteIncome = () => {
     if (!deleteIncomeId) return;
-    try {
-      setIsDeleting(true);
-      await API.delete(`/income/${deleteIncomeId}`);
-      setDeleteIncomeId(null);
-      await fetchIncomes();
-    } catch (error) {
-      console.error("Error deleting income:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    deleteIncomeMutation.mutate(deleteIncomeId, {
+      onSuccess: () => setDeleteIncomeId(null),
+      onError: (err) => {
+        console.error("Error deleting income:", err);
+      }
+    });
   };
 
   const handleExport = () => {

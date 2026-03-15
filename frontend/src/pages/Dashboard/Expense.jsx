@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
@@ -6,15 +6,16 @@ import Button from "../../components/ui/Button";
 import TransactionList from "../../components/dashboard/TransactionList";
 import Modal from "../../components/ui/Modal";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
-import API from "../../api/axios";
 import {
-  getExpenseCategories,
-  createExpenseCategory,
-  deleteExpenseCategory,
-  getUniqueCategories,
-  copyPreviousMonthCategories,
-} from "../../api/expenseCategory";
-import { getExpenses } from "../../api/expense";
+  useGetExpenses,
+  useGetExpenseCategories,
+  useGetUniqueExpenseCategories,
+  useAddExpense,
+  useDeleteExpense,
+  useAddExpenseCategory,
+  useDeleteExpenseCategory,
+  useCopyPreviousMonthCategories,
+} from "../../hooks/queries/useExpenses";
 import { exportExpenseToExcel } from "../../utils/exportToExcel";
 import { formatCurrency } from "../../utils/formatters";
 import {
@@ -25,24 +26,17 @@ import {
   IoTrashOutline,
 } from "react-icons/io5";
 
-// Categories are now dynamic and fetched from the server
-
 const Expense = () => {
   const currentDate = new Date();
-  const [expenses, setExpenses] = useState([]);
-  const [userCategories, setUserCategories] = useState([]);
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // حالات الترقيم - Pagination states
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
-  const [paginationLoading, setPaginationLoading] = useState(false);
+  
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -50,118 +44,83 @@ const Expense = () => {
     date: new Date().toISOString().split("T")[0],
     description: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [activeTab, setActiveTab] = useState("expenses");
 
   // Category specific state
-  const [categories, setCategories] = useState([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({
     category: "",
     amount: "",
     description: "",
   });
-  const [isCategorySubmitting, setIsCategorySubmitting] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
   const [deleteExpenseId, setDeleteExpenseId] = useState(null);
   const [deleteCategoryId, setDeleteCategoryId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchUserCategories = useCallback(async () => {
-    try {
-      const data = await getUniqueCategories();
-      setUserCategories(data);
-    } catch (error) {
-      console.error("Error fetching user categories:", error);
-    }
-  }, []);
+  // Queries
+  const { data: expensesData, isLoading: loading, isFetching: paginationLoading } = useGetExpenses({ 
+    month, 
+    year, 
+    page: currentPage, 
+    limit: itemsPerPage 
+  });
+  
+  const expenses = expensesData?.data || [];
+  const totalPages = expensesData?.pagination?.totalPages || 1;
+  const totalItems = expensesData?.pagination?.totalItems || 0;
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const data = await getExpenseCategories(month, year);
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      setError("Failed to load expense categories");
-    }
-  }, [month, year]);
+  const { data: categories = [] } = useGetExpenseCategories(month, year);
+  const { data: userCategories = [] } = useGetUniqueExpenseCategories();
 
-  const fetchExpenses = useCallback(async () => {
-    try {
-      if (currentPage === 1) {
-        setLoading(true);
-      } else {
-        setPaginationLoading(true);
-      }
+  // Mutations
+  const addExpenseMutation = useAddExpense();
+  const deleteExpenseMutation = useDeleteExpense();
+  const addExpenseCategoryMutation = useAddExpenseCategory();
+  const deleteExpenseCategoryMutation = useDeleteExpenseCategory();
+  const copyPreviousMonthCategoriesMutation = useCopyPreviousMonthCategories();
 
-      const response = await getExpenses(
-        month,
-        year,
-        currentPage,
-        itemsPerPage,
-      );
-
-      setExpenses(response.data);
-      setTotalPages(response.pagination.totalPages);
-      setTotalItems(response.pagination.totalItems);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      setError("Failed to load expenses");
-    } finally {
-      setLoading(false);
-      setPaginationLoading(false);
-    }
-  }, [month, year, currentPage, itemsPerPage]);
+  const isSubmitting = addExpenseMutation.isPending || copyPreviousMonthCategoriesMutation.isPending;
+  const isDeleting = deleteExpenseMutation.isPending || deleteExpenseCategoryMutation.isPending;
+  const isCategorySubmitting = addExpenseCategoryMutation.isPending;
 
   useEffect(() => {
+    // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
     const refreshData = () => {
-      if (activeTab === "categories") {
-        fetchCategories();
-      } else {
-        fetchUserCategories();
-        fetchExpenses();
-      }
+       // React Query automatically handles refetching on invalidation
     };
-
-    refreshData();
-
-    // Listen for AI-triggered refreshes
     window.addEventListener("refreshData", refreshData);
     return () => window.removeEventListener("refreshData", refreshData);
-  }, [activeTab, fetchCategories, fetchUserCategories, fetchExpenses]);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    setError(""); // Clear previous errors
-    setIsSubmitting(true);
-    try {
-      await API.post("/expense", formData);
-      setIsModalOpen(false);
-      setFormData({
-        title: "",
-        amount: "",
-        category: "Other",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-      });
-      setCurrentPage(1); // العودة للصفحة الأولى بعد الإضافة
-      await fetchExpenses();
-    } catch (error) {
-      console.error("Error adding expense:", error);
-      const msg =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to add expense. Please check your connection.";
-      setError(msg);
-    } finally {
-      setIsSubmitting(false);
-    }
+    setError("");
+    
+    addExpenseMutation.mutate(formData, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setFormData({
+          title: "",
+          amount: "",
+          category: "Other",
+          date: new Date().toISOString().split("T")[0],
+          description: "",
+        });
+        setCurrentPage(1); 
+      },
+      onError: (err) => {
+        console.error("Error adding expense:", err);
+        const msg = err.response?.data?.error || err.response?.data?.message || "Failed to add expense. Please check your connection.";
+        setError(msg);
+      }
+    });
   };
 
   const handleDelete = (id) => {
@@ -172,70 +131,57 @@ const Expense = () => {
     exportExpenseToExcel(expenses);
   };
 
-  const totalExpense = expenses.reduce(
-    (sum, expense) => sum + Number(expense.amount || 0),
-    0,
-  );
+  const totalExpense = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
-  const handleCategorySubmit = async (e) => {
+  const handleCategorySubmit = (e) => {
     e.preventDefault();
     if (isCategorySubmitting) return;
     setError("");
-    setIsCategorySubmitting(true);
-    try {
-      await createExpenseCategory({
-        category: categoryFormData.category,
-        amount: parseFloat(categoryFormData.amount) || 0,
-        month,
-        year,
-        description: categoryFormData.description,
-      });
-      setShowCategoryModal(false);
-      setCategoryFormData({ category: "", amount: "", description: "" });
-      await fetchCategories();
-      await fetchUserCategories();
-    } catch (error) {
-      console.error("Error adding expense category:", error);
-      setError("Failed to add expense category.");
-    } finally {
-      setIsCategorySubmitting(true); // Wait, this should be false, but following the pattern for now
-      setIsCategorySubmitting(false);
-    }
+    
+    addExpenseCategoryMutation.mutate({
+      category: categoryFormData.category,
+      amount: parseFloat(categoryFormData.amount) || 0,
+      month,
+      year,
+      description: categoryFormData.description,
+    }, {
+      onSuccess: () => {
+        setShowCategoryModal(false);
+        setCategoryFormData({ category: "", amount: "", description: "" });
+      },
+      onError: (err) => {
+        console.error("Error adding expense category:", err);
+        setError("Failed to add expense category.");
+      }
+    });
   };
 
   const handleDeleteCategory = (id) => {
     setDeleteCategoryId(id);
   };
 
-  const confirmDeleteExpense = async () => {
+  const confirmDeleteExpense = () => {
     if (!deleteExpenseId) return;
-    try {
-      setIsDeleting(true);
-      await API.delete(`/expense/${deleteExpenseId}`);
-      setDeleteExpenseId(null);
-      await fetchExpenses();
-    } catch (error) {
-      console.error("Error deleting expense:", error);
-      setError("Failed to delete expense");
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    deleteExpenseMutation.mutate(deleteExpenseId, {
+      onSuccess: () => setDeleteExpenseId(null),
+      onError: (err) => {
+        console.error("Error deleting expense:", err);
+        setError("Failed to delete expense");
+      }
+    });
   };
 
-  const confirmDeleteCategory = async () => {
+  const confirmDeleteCategory = () => {
     if (!deleteCategoryId) return;
-    try {
-      setIsDeleting(true);
-      await deleteExpenseCategory(deleteCategoryId);
-      setDeleteCategoryId(null);
-      await fetchCategories();
-      await fetchUserCategories();
-    } catch (error) {
-      console.error("Error deleting category expense:", error);
-      setError("Failed to delete category expense");
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    deleteExpenseCategoryMutation.mutate(deleteCategoryId, {
+      onSuccess: () => setDeleteCategoryId(null),
+      onError: (err) => {
+        console.error("Error deleting category expense:", err);
+        setError("Failed to delete category expense");
+      }
+    });
   };
 
   const totalCategoryExpenses = categories.reduce(
@@ -263,23 +209,20 @@ const Expense = () => {
     setShowCopyModal(true);
   };
 
-  const confirmCopyPreviousMonthCategories = async () => {
-    try {
-      setIsSubmitting(true);
-      setCopyStatus("");
-      await copyPreviousMonthCategories(month, year);
-      await fetchCategories();
-      await fetchUserCategories();
-      setCopyStatus("Categories copied successfully!");
-    } catch (error) {
-      console.error("Error copying categories:", error);
-      setCopyStatus(
-        error.response?.data?.error ||
-          "Failed to copy categories. They might already exist or the previous month is empty.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+  const confirmCopyPreviousMonthCategories = () => {
+    setCopyStatus("");
+    copyPreviousMonthCategoriesMutation.mutate({ month, year }, {
+      onSuccess: () => {
+        setCopyStatus("Categories copied successfully!");
+      },
+      onError: (err) => {
+        console.error("Error copying categories:", err);
+        setCopyStatus(
+          err.response?.data?.error ||
+            "Failed to copy categories. They might already exist or the previous month is empty."
+        );
+      }
+    });
   };
 
   return (

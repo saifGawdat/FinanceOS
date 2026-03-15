@@ -4,10 +4,11 @@ import { formatCurrency } from "../../utils/formatters";
 const SummaryCard = ({
   title,
   amount,
+  // eslint-disable-next-line no-unused-vars
   icon: Icon,
   iconColor,
   bgGradient,
-  highlight = false,
+  highlight,
 }) => {
   const borderColorMap = {
     "from-purple-500 to-purple-500": "border-l-blue-500",

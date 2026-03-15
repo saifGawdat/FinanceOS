@@ -1,75 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Button from "../../components/ui/Button";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
 import {
-  getMonthlySummary,
-  getAllMonthlySummaries,
-  recalculateMonthlySummary,
-} from "../../api/monthlySummary";
+  useGetMonthlySummary,
+  useGetAllMonthlySummaries,
+  useRecalculateSummary
+} from "../../hooks/queries/useMonthlySummary";
 import { formatCurrency } from "../../utils/formatters";
 
 const ProfitSummary = () => {
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
-  const [summary, setSummary] = useState(null);
-  const [allSummaries, setAllSummaries] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [recalculating, setRecalculating] = useState(false);
   const [viewMode, setViewMode] = useState("single"); // 'single' or 'all'
 
-  useEffect(() => {
-    if (viewMode === "single") {
-      fetchMonthlySummary();
-    } else {
-      fetchAllSummaries();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month, year, viewMode]);
+  // Queries
+  const { data: summary, isLoading: isLoadingSingle } = useGetMonthlySummary(month, year);
+  
+  // Only enable the "All Summaries" query if the user is in "all" viewmode to save requests
+  const { data: allSummaries = [], isLoading: isLoadingAll } = useGetAllMonthlySummaries(viewMode === "all");
 
-  const fetchMonthlySummary = async () => {
-    try {
-      setLoading(true);
-      const data = await getMonthlySummary(month, year);
-      setSummary(data);
-    } catch (error) {
-      console.error("Error fetching summary:", error);
-      setError("Failed to load monthly summary");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = viewMode === "single" ? isLoadingSingle : isLoadingAll;
 
-  const fetchAllSummaries = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllMonthlySummaries();
-      setAllSummaries(data);
-    } catch (error) {
-      console.error("Error fetching summaries:", error);
-      setError("Failed to load summaries");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Mutations
+  const recalculateMutation = useRecalculateSummary();
+  const recalculating = recalculateMutation.isPending;
 
-  const handleRecalculate = async () => {
-    try {
-      setRecalculating(true);
-      setError("");
-      await recalculateMonthlySummary(month, year);
-      await fetchMonthlySummary();
-      // Show success message briefly
-      setError("✓ Summary recalculated successfully!");
-      setTimeout(() => setError(""), 3000);
-    } catch (error) {
-      console.error("Error recalculating:", error);
-      setError("Failed to recalculate summary");
-    } finally {
-      setRecalculating(false);
-    }
+  const handleRecalculate = () => {
+    setError("");
+    recalculateMutation.mutate({ month, year }, {
+      onSuccess: () => {
+        setError("✓ Summary recalculated successfully!");
+        setTimeout(() => setError(""), 3000);
+      },
+      onError: (err) => {
+        console.error("Error recalculating:", err);
+        setError("Failed to recalculate summary");
+      }
+    });
   };
 
   const handleMonthYearChange = (newMonth, newYear) => {
