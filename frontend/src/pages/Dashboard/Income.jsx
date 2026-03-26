@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
@@ -6,18 +6,17 @@ import Button from "../../components/ui/Button";
 import TransactionList from "../../components/dashboard/TransactionList";
 import Modal from "../../components/ui/Modal";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
-import API from "../../api/axios";
+import { useGetIncomes, useAddIncome, useDeleteIncome } from "../../hooks/queries/useIncome";
 import { formatCurrency } from "../../utils/formatters";
-import { getIncomes } from "../../api/income";
 import { exportIncomeToExcel } from "../../utils/exportToExcel";
 import { IoAddCircleOutline, IoDownloadOutline } from "react-icons/io5";
 
 const Income = () => {
   const currentDate = new Date();
-  const [incomes, setIncomes] = useState([]);
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -25,90 +24,79 @@ const Income = () => {
     date: new Date().toISOString().split("T")[0],
     description: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // حالات الترقيم - Pagination states
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
-  const [paginationLoading, setPaginationLoading] = useState(false);
   const [deleteIncomeId, setDeleteIncomeId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchIncomes = useCallback(async () => {
-    try {
-      if (currentPage === 1) {
-        setLoading(true);
-      } else {
-        setPaginationLoading(true);
-      }
+  // Queries
+  const { data: incomesData, isLoading: loading, isFetching: paginationLoading } = useGetIncomes({
+    month,
+    year,
+    page: currentPage,
+    limit: itemsPerPage
+  });
 
-      const response = await getIncomes(month, year, currentPage, itemsPerPage);
+  const incomes = incomesData?.data || [];
+  const totalPages = incomesData?.pagination?.totalPages || 1;
+  const totalItems = incomesData?.pagination?.totalItems || 0;
 
-      setIncomes(response.data);
-      setTotalPages(response.pagination.totalPages);
-      setTotalItems(response.pagination.totalItems);
-    } catch (error) {
-      console.error("Error fetching incomes:", error);
-    } finally {
-      setLoading(false);
-      setPaginationLoading(false);
-    }
-  }, [month, year, currentPage, itemsPerPage]);
+  // Mutations
+  const addIncomeMutation = useAddIncome();
+  const deleteIncomeMutation = useDeleteIncome();
+
+  const isSubmitting = addIncomeMutation.isPending;
+  const isDeleting = deleteIncomeMutation.isPending;
 
   useEffect(() => {
-    fetchIncomes();
-
-    // Listen for AI-triggered refreshes
-    window.addEventListener("refreshData", fetchIncomes);
-    return () => window.removeEventListener("refreshData", fetchIncomes);
-  }, [fetchIncomes]);
+    // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
+    const refreshData = () => {
+       // React Query automatically handles refetching on invalidation
+    };
+    window.addEventListener("refreshData", refreshData);
+    return () => window.removeEventListener("refreshData", refreshData);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await API.post("/income", formData);
-      setIsModalOpen(false);
-      setFormData({
-        title: "",
-        amount: "",
-        category: "",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-      });
-      setCurrentPage(1); // العودة للصفحة الأولى بعد الإضافة
-      await fetchIncomes();
-    } catch (error) {
-      console.error("Error adding income:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    addIncomeMutation.mutate(formData, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setFormData({
+          title: "",
+          amount: "",
+          category: "",
+          date: new Date().toISOString().split("T")[0],
+          description: "",
+        });
+        setCurrentPage(1);
+      },
+      onError: (err) => {
+        console.error("Error adding income:", err);
+      }
+    });
   };
 
   const handleDelete = (id) => {
     setDeleteIncomeId(id);
   };
 
-  const confirmDeleteIncome = async () => {
+  const confirmDeleteIncome = () => {
     if (!deleteIncomeId) return;
-    try {
-      setIsDeleting(true);
-      await API.delete(`/income/${deleteIncomeId}`);
-      setDeleteIncomeId(null);
-      await fetchIncomes();
-    } catch (error) {
-      console.error("Error deleting income:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    deleteIncomeMutation.mutate(deleteIncomeId, {
+      onSuccess: () => setDeleteIncomeId(null),
+      onError: (err) => {
+        console.error("Error deleting income:", err);
+      }
+    });
   };
 
   const handleExport = () => {
@@ -173,7 +161,7 @@ const Income = () => {
           />
           {/* أدوات التحكم في الترقيم - Pagination Controls */}
           {!loading && incomes.length > 0 && (
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-4 rounded-xl border border-white/6">
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
               {/* معلومات الصفحة - Page Info */}
               <div className="text-sm text-gray-400">
                 <span className="font-medium">Showing</span>{" "}
@@ -192,7 +180,7 @@ const Income = () => {
                     setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={currentPage === 1 || paginationLoading}
-                  className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
                   <span>←</span>
                   <span className="hidden sm:inline">Previous</span>
@@ -213,7 +201,7 @@ const Income = () => {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={currentPage >= totalPages || paginationLoading}
-                  className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
                   <span className="hidden sm:inline">Next</span>
                   <span>→</span>
@@ -271,7 +259,7 @@ const Income = () => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Add notes..."
-                className="w-full px-4 py-3 bg-white/3 border border-white/6 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/5 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
               />
             </div>

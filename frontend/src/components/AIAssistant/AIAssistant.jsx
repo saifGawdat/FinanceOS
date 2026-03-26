@@ -189,7 +189,7 @@ const AIAssistant = () => {
 
       {/* Assistant Window */}
       {isOpen && (
-        <div className="w-[350px] sm:w-[400px] h-[550px] bg-[#12141a] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300 slide-in-from-bottom-10">
+        <div className="w-[350px] sm:w-[400px] h-[550px] bg-[#09090c] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300 slide-in-from-bottom-10">
           {/* Header */}
           <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-3">

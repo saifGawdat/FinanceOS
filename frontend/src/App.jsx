@@ -24,8 +24,12 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f1115]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#060608]">
+        <div className="relative w-12 h-12 mb-4">
+          <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+          <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">FinanceOS Security Check</p>
       </div>
     );
   }
@@ -117,8 +121,12 @@ const Root = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f1115]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#060608]">
+        <div className="relative w-12 h-12 mb-4">
+          <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+          <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">FinanceOS Integrity Check</p>
       </div>
     );
   }
@@ -129,3 +137,4 @@ const Root = () => {
     <Navigate to="/login" />
   );
 };
+

@@ -11,7 +11,11 @@ import {
 const COLORS = [
   "#3b82f6", // Blue
   "#ef4444", // Red
-  "#ffffff", // white
+  "#22c55e", // Green
+  "#f59e0b", // Amber
+  "#06b6d4", // Cyan
+  "#ec4899", // Pink
+  "#ffffff", // White
 ];
 
 const PieChart = ({ data }) => {
@@ -38,11 +42,12 @@ const PieChart = ({ data }) => {
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: "#1f2229",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "8px",
+            backgroundColor: "#0e0e12",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
             fontSize: "12px",
             color: "#e5e7eb",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
           }}
           itemStyle={{ color: "#e5e7eb" }}
         />

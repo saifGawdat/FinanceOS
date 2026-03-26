@@ -9,7 +9,7 @@ const Button = ({
   disabled = false,
 }) => {
   const baseClasses =
-    "px-4 py-2.5 rounded-lg font-medium transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0f1115]";
+    "px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#060608]";
 
   const variants = {
     primary:

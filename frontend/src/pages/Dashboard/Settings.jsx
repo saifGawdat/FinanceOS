@@ -133,151 +133,172 @@ const Settings = () => {
   };
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-[1440px] mx-auto p-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-            Settings
+        <div className="mb-12">
+          <h1 className="text-4xl font-black text-white tracking-tight uppercase">
+            System <span className="text-gray-500">Configuration</span>
           </h1>
-          <p className="text-gray-400 mt-1">Manage your account settings</p>
+          <p className="text-[10px] font-black text-gray-500 mt-2 uppercase tracking-[0.2em]">
+            Core preferences and security management
+          </p>
         </div>
 
-        {/* Profile Section */}
-        <section className="mb-6 bg-[#1a1d24] rounded-2xl shadow-xl p-6 border border-white/8">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <IoPhonePortraitOutline className="text-green-400" size={24} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-100">Profile</h2>
-              <p className="text-sm text-gray-400">Your contact info used for WhatsApp</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Your WhatsApp Phone Number
-              </label>
-              <div className="flex gap-3">
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="e.g. +201234567890"
-                  className="flex-1 px-4 py-3 bg-white/3 border border-white/10 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:border-green-500/50 transition-all"
-                />
-                <button
-                  onClick={handleSavePhone}
-                  disabled={isSavingPhone}
-                  className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium whitespace-nowrap"
-                >
-                  <IoSaveOutline size={18} />
-                  {isSavingPhone ? "Saving..." : "Save"}
-                </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
+            {/* Profile Section */}
+            <section className="bg-[#0e0e12] rounded-2xl shadow-2xl p-8 border border-white/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full pointer-events-none" />
+              
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                  <IoPhonePortraitOutline className="text-blue-500" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xs font-black text-white uppercase tracking-[0.2em]">Communication</h2>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">WhatsApp integration profile</p>
+                </div>
               </div>
 
-              {phoneSaved && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-400 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-xl">
-                  <IoCheckmarkCircle size={16} />
-                  Phone number saved successfully!
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[8px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4 ml-1">
+                    System Phone Number
+                  </label>
+                  <div className="flex gap-4">
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+00 000 000 000"
+                      className="flex-1 px-5 py-4 bg-[#09090c] border border-white/5 rounded-xl text-xs font-bold text-white placeholder-gray-700 focus:outline-none focus:border-blue-500/30 transition-all shadow-inner"
+                    />
+                    <button
+                      onClick={handleSavePhone}
+                      disabled={isSavingPhone}
+                      className="flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-20 text-[10px] font-black uppercase tracking-widest text-white rounded-xl transition-all shadow-lg shadow-blue-600/20 whitespace-nowrap"
+                    >
+                      <IoSaveOutline size={16} />
+                      {isSavingPhone ? "SYNCING..." : "COMMIT"}
+                    </button>
+                  </div>
+
+                  {phoneSaved && (
+                    <div className="mt-4 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-blue-500 bg-blue-500/5 border border-blue-500/10 px-5 py-3 rounded-xl animate-pulse">
+                      <IoCheckmarkCircle size={14} />
+                      Registry Updated Successfully
+                    </div>
+                  )}
+                  {phoneError && (
+                    <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-500/5 border border-red-500/10 px-5 py-3 rounded-xl animate-shake">
+                      {phoneError}
+                    </div>
+                  )}
+                  <p className="text-[8px] font-black text-gray-700 mt-4 uppercase tracking-widest leading-relaxed">
+                    CRITICAL: Ensure international prefix (e.g., +20) is included for automated WhatsApp dispatch logic.
+                  </p>
                 </div>
-              )}
-              {phoneError && (
-                <div className="mt-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl">
-                  {phoneError}
-                </div>
-              )}
-              <p className="text-xs text-gray-500 mt-2">
-                Include country code (e.g. +20 for Egypt). This number will be used when you click WhatsApp on customer cards.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Danger Zone Section */}
-        <section className="bg-[#1a1d24] rounded-2xl shadow-xl p-6 border border-red-500/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-500/10 rounded-lg">
-              <IoWarningOutline className="text-red-500" size={24} />
-            </div>
-            <h2 className="text-xl font-semibold text-red-500">Danger Zone</h2>
-          </div>
-
-          <p className="text-gray-400 mb-6">
-            These actions are irreversible. Please proceed with caution.
-          </p>
-
-          <div className="p-4 bg-red-500/5 rounded-xl border border-red-500/10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h3 className="font-medium text-gray-100">Delete Account</h3>
-                <p className="text-sm text-gray-400 mt-1">
-                  Permanently delete your account and all associated data. This
-                  action cannot be undone.
-                </p>
               </div>
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium whitespace-nowrap"
-              >
-                <IoTrashOutline size={18} />
-                Delete Account
-              </button>
-            </div>
-          </div>
-        </section>
-        {!isStandalone && (
-          <section className="mt-5 bg-[#1a1d24] rounded-2xl shadow-xl p-6 border border-blue-500/20 flex flex-col gap-2 md:flex-row items-center justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-gray-300 text-2xl font-semibold">
-                Install the app
-              </p>
-              <p className="text-gray-400 mt-1">
-                Install the app on your device to access it offline.
-              </p>
-            </div>
+            </section>
 
-            <div className="flex items-center gap-3 mt-4">
-              <button
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium whitespace-nowrap"
-                onClick={() => setShowInstallModal(true)}
-              >
-                <IoDownloadOutline size={18} />
-                Download App
-              </button>
-            </div>
-          </section>
-        )}
+            {!isStandalone && (
+              <section className="bg-[#0e0e12] rounded-2xl shadow-2xl p-8 border border-white/5 relative overflow-hidden group">
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px] rounded-full pointer-events-none" />
+                
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                    <IoDownloadOutline className="text-indigo-500" size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-black text-white uppercase tracking-[0.2em]">Application</h2>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">Standardize accessibility</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                  <div>
+                    <p className="text-lg font-black text-white uppercase tracking-tight">System PWA</p>
+                    <p className="text-[10px] font-bold text-gray-600 mt-1 uppercase tracking-widest">Enable standalone infrastructure</p>
+                  </div>
+                  <button
+                    className="flex items-center gap-3 px-8 py-4 bg-[#09090c] border border-white/5 hover:border-white/10 text-[10px] font-black uppercase tracking-widest text-white rounded-xl transition-all shadow-xl group/btn"
+                    onClick={() => setShowInstallModal(true)}
+                  >
+                    <IoDownloadOutline size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                    Deploy to Local
+                  </button>
+                </div>
+              </section>
+            )}
+          </div>
+
+          <div>
+            {/* Danger Zone Section */}
+            <section className="bg-[#0e0e12] rounded-2xl shadow-2xl p-8 border border-red-900/10 relative overflow-hidden h-full">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-red-500/2 blur-[80px] rounded-full pointer-events-none" />
+              
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
+                  <IoWarningOutline className="text-red-500" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xs font-black text-red-500 uppercase tracking-[0.2em]">Security Protocol</h2>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mt-0.5">Terminal operations</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="p-8 bg-red-500/1 rounded-2xl border border-red-500/5 hover:border-red-500/10 transition-all flex flex-col justify-between h-[300px]">
+                  <div>
+                    <h3 className="text-lg font-black text-gray-200 uppercase tracking-tight">Erase Credentials</h3>
+                    <p className="text-[10px] font-bold text-gray-500 mt-2 uppercase tracking-[0.15em] leading-relaxed">
+                      Executing this utility will purge all records from the distributed ledger. This action is irreversible and terminates the authentication lease.
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#09090c] border border-red-500/20 hover:bg-red-500/5 text-red-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.2em] shadow-xl"
+                  >
+                    <IoTrashOutline size={18} />
+                    Initiate Termination
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
+
       {showInstallModal && (
         <Modal
           isOpen={showInstallModal}
           onClose={() => setShowInstallModal(false)}
-          title="Install App"
+          title="Infrastructure Deployment"
         >
-          <div className="space-y-4">
-            <p className="text-gray-400">
-              Are you sure you want to install the app?
+          <div className="space-y-8 p-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+              Confirm standalone application provisioning? This enables cached access and dedicated shell UI.
             </p>
             {installError && (
-              <div className="text-sm px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200">
+              <div className="text-[10px] font-black px-5 py-4 rounded-xl bg-red-500/5 border border-red-500/10 text-red-500 uppercase tracking-widest">
                 {installError}
               </div>
             )}
-            <div className="flex items-center gap-3">
-              <button
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium whitespace-nowrap px-4 py-2"
-                onClick={installApp}
-              >
-                Install
-              </button>
-              <button
-                className="bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium whitespace-nowrap px-4 py-2"
+            <div className="flex gap-4 border-t border-white/5 pt-8">
+              <Button
+                variant="secondary"
+                className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest"
                 onClick={() => setShowInstallModal(false)}
               >
-                Cancel
-              </button>
+                Abort
+              </Button>
+              <Button
+                className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-500/20"
+                onClick={installApp}
+              >
+                Proceed
+              </Button>
             </div>
           </div>
         </Modal>
@@ -287,47 +308,44 @@ const Settings = () => {
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !isDeleting && !deleteSuccess && resetDeleteModal()}
-        title="Delete Account"
+        title="Access Termination"
       >
-        <div className="space-y-4">
+        <div className="space-y-8 p-4">
           {deleteSuccess ? (
-            <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-4 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                <IoCheckmarkCircle className="text-emerald-500" size={40} />
+            <div className="text-center py-8">
+              <div className="w-24 h-24 mx-auto mb-6 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/20 animate-pulse">
+                <IoCheckmarkCircle className="text-blue-500" size={48} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-100 mb-2">
-                Account Deleted
+              <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2">
+                Memory Purged
               </h3>
-              <p className="text-gray-400">
-                Your account has been successfully deleted. Redirecting to
-                login...
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                Account dissolution finalized. Neutralizing session...
               </p>
             </div>
           ) : (
             <>
-              <div className="flex items-start gap-3 p-4 bg-red-500/10 rounded-xl border border-red-500/20">
+              <div className="flex items-start gap-4 p-6 bg-red-500/5 rounded-2xl border border-red-500/10">
                 <IoWarningOutline
                   className="text-red-500 shrink-0 mt-0.5"
                   size={24}
                 />
                 <div>
-                  <h3 className="font-semibold text-red-400 mb-1">
-                    Warning: This action cannot be undone!
+                  <h3 className="text-xs font-black text-red-500 uppercase tracking-[0.1em] mb-2">
+                    CRITICAL WARNING
                   </h3>
-                  <p className="text-sm text-red-500/80">
-                    Deleting your account will permanently remove all your data,
-                    including transactions, expenses, and income records.
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                    Dissolution is irreversible. All transactional records, ledger entries, and profile metadata will be permanently neutralized.
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <label
                   htmlFor="delete-confirm"
-                  className="block text-sm font-medium text-gray-400"
+                  className="block text-[8px] font-black text-gray-600 uppercase tracking-[0.3em] ml-1"
                 >
-                  Type <span className="font-bold text-red-500">DELETE</span> to
-                  confirm:
+                  Confirm Authorization Key
                 </label>
                 <input
                   type="text"
@@ -336,40 +354,37 @@ const Settings = () => {
                   onChange={(e) =>
                     setDeleteConfirmText(e.target.value.toUpperCase())
                   }
-                  placeholder="DELETE"
+                  placeholder="TYPE 'DELETE' TO CONFIRM"
                   disabled={isDeleting}
-                  className="w-full px-4 py-3 bg-white/3 border border-white/10 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:border-red-500/50 transition-all disabled:opacity-40"
+                  className="w-full px-6 py-4 bg-[#09090c] border border-white/5 rounded-2xl text-xs font-black text-white placeholder-gray-800 focus:outline-none focus:border-red-500/30 transition-all disabled:opacity-20 uppercase"
                 />
               </div>
 
               {deleteError && (
-                <div className="p-4 bg-red-100 border border-red-300 rounded-lg">
-                  <p className="text-sm text-red-800">{deleteError}</p>
+                <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-xl">
+                  <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">{deleteError}</p>
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-4 pt-4 border-t border-white/5">
                 <button
                   onClick={resetDeleteModal}
                   disabled={isDeleting}
-                  className="flex-1 px-4 py-3 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 py-4 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white rounded-2xl transition-all disabled:opacity-20"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting || deleteConfirmText !== "DELETE"}
-                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-red-600/20"
+                  className="flex-1 py-4 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-20 shadow-lg shadow-red-600/20 flex items-center justify-center gap-3"
                 >
                   {isDeleting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Deleting...
-                    </>
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      <IoTrashOutline size={20} />
-                      Delete Account
+                      <IoTrashOutline size={18} />
+                      Purge
                     </>
                   )}
                 </button>
