@@ -1,7 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from "react";
 import API from "../api/axios";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -16,21 +17,31 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const token = localStorage.getItem("token");
-    if (token) {
-      // Get user info
-      API.get("/auth/me")
-        .then((res) => {
+
+    const verifyToken = async () => {
+      try {
+        const res = await API.get("/auth/me");
+        if (isMounted) {
           setUser(res.data);
           setLoading(false);
-        })
-        .catch(() => {
-          localStorage.removeItem("token");
-          setLoading(false);
-        });
+        }
+      } catch {
+        localStorage.removeItem("token");
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    if (token) {
+      verifyToken();
     } else {
-      setLoading(false);
+      Promise.resolve().then(() => {
+        if (isMounted) setLoading(false);
+      });
     }
+    
+    return () => { isMounted = false; };
   }, []);
 
   const login = async (email, password) => {

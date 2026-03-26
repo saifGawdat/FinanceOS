@@ -16,7 +16,7 @@ const TransactionList = ({ transactions, onDelete, type }) => {
       {transactions.map((transaction) => (
         <div
           key={transaction._id}
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/2 border-b border-white/6 hover:bg-white/4 transition-all duration-150 group gap-4"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/2 border-b border-white/5 hover:bg-white/4 transition-all duration-150 group gap-4"
         >
           <div className="flex-1 w-full">
             <h4 className="font-semibold text-gray-200 wrap-break-word">
@@ -37,7 +37,7 @@ const TransactionList = ({ transactions, onDelete, type }) => {
               </p>
             )}
           </div>
-          <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/6">
+          <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
             <span
               className={`text-lg font-bold ${
                 type === "income" ? "text-blue-500" : "text-red-400"
