@@ -45,20 +45,20 @@ const MonthYearSelector = ({ onSelect, initialMonth, initialYear }) => {
 
   return (
     <div className="flex gap-4 items-center">
-      <div className="flex flex-col items-start">
+      <div className="flex flex-col items-start p-2">
         <label className="text-xs font-medium text-gray-500 mb-1.5 ml-1">
           Month
         </label>
         <select
           value={month}
           onChange={handleMonthChange}
-          className="px-3 py-2 bg-white/3 border border-white/6 rounded-lg text-gray-200 text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/5 transition-all duration-150 cursor-pointer"
+          className="px-3 py-2 bg-transparent border border-white/5 rounded-xl text-gray-200 text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/3 transition-all duration-300 cursor-pointer shadow-lg shadow-black/20"
         >
           {months.map((m) => (
             <option
               key={m.value}
               value={m.value}
-              className="bg-[#1a1d24] text-gray-200"
+              className="bg-[#0e0e12] text-gray-200"
             >
               {m.label}
             </option>
@@ -66,16 +66,16 @@ const MonthYearSelector = ({ onSelect, initialMonth, initialYear }) => {
         </select>
       </div>
       <div className="flex flex-col items-start">
-        <label className="text-xs font-medium text-gray-500 mb-1.5 ml-1">
+        <label className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5 ml-1">
           Year
         </label>
         <select
           value={year}
           onChange={handleYearChange}
-          className="px-3 py-2 bg-white/3 border border-white/6 rounded-lg text-gray-200 text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/5 transition-all duration-150 cursor-pointer"
+          className="px-3 py-2 bg-transparent border border-white/5 rounded-xl text-gray-200 text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/3 transition-all duration-300 cursor-pointer shadow-lg shadow-black/20"
         >
           {years.map((y) => (
-            <option key={y} value={y} className="bg-[#1a1d24] text-gray-200">
+            <option key={y} value={y} className="bg-[#0e0e12] text-gray-200">
               {y}
             </option>
           ))}

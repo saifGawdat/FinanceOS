@@ -304,13 +304,13 @@ const Expense = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex p-1 bg-white/3 border border-white/6 rounded-xl mb-6 w-full md:w-fit">
+        <div className="flex p-1 bg-white/2 border border-white/5 rounded-xl mb-6 w-full md:w-fit backdrop-blur-md">
           <button
             onClick={() => setActiveTab("expenses")}
-            className={`flex-1 md:flex-none px-6 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all duration-300 ${
               activeTab === "expenses"
-                ? "bg-blue-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                ? "bg-white/10 text-white shadow-lg shadow-black/20"
+                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
             }`}
           >
             <IoListOutline size={18} />
@@ -318,10 +318,10 @@ const Expense = () => {
           </button>
           <button
             onClick={() => setActiveTab("categories")}
-            className={`flex-1 md:flex-none px-6 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
+            className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all duration-300 ${
               activeTab === "categories"
-                ? "bg-blue-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                ? "bg-white/10 text-white shadow-lg shadow-black/20"
+                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
             }`}
           >
             <IoGridOutline size={18} />
@@ -338,50 +338,34 @@ const Expense = () => {
             />
             {/* أدوات التحكم في الترقيم - Pagination Controls */}
             {!loading && expenses.length > 0 && (
-              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-4 rounded-xl border border-white/6">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
                 {/* معلومات الصفحة - Page Info */}
-                <div className="text-sm text-gray-400">
-                  <span className="font-medium">Showing</span>{" "}
-                  <span className="font-bold text-red-400">
-                    {expenses.length}
-                  </span>{" "}
-                  <span className="font-medium">of</span>{" "}
-                  <span className="font-bold text-red-400">{totalItems}</span>{" "}
-                  <span className="font-medium">transactions</span>
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                  Showing <span className="text-white">{expenses.length}</span> of <span className="text-white">{totalItems}</span> records
                 </div>
 
                 {/* أزرار التنقل - Navigation Buttons */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={currentPage === 1 || paginationLoading}
-                    className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
-                    <span>←</span>
-                    <span className="hidden sm:inline">Previous</span>
+                    <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
+                    <span>Prev</span>
                   </button>
 
-                  <div className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-xl font-bold min-w-[100px] text-center">
-                    {paginationLoading ? (
-                      <span className="text-xs">Loading...</span>
-                    ) : (
-                      <span>
-                        Page {currentPage} of {totalPages}
-                      </span>
-                    )}
+                  <div className="px-6 py-3 bg-white/5 border border-white/5 text-white text-[10px] font-black uppercase tracking-widest rounded-xl min-w-[140px] text-center shadow-inner">
+                    {paginationLoading ? "Syncing..." : `Page ${currentPage} / ${totalPages}`}
                   </div>
 
                   <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                     disabled={currentPage >= totalPages || paginationLoading}
-                    className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
-                    <span className="hidden sm:inline">Next</span>
-                    <span>→</span>
+                    <span>Next</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                   </button>
                 </div>
               </div>
@@ -398,40 +382,40 @@ const Expense = () => {
                 return (
                   <div
                     key={cat._id || cat.category}
-                    className="bg-[#1a1d24] rounded-2xl overflow-hidden border border-white/6 hover:border-white/10 transition-all duration-150 shadow-lg"
+                    className="bg-[#0e0e12] rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all duration-300 shadow-2xl group"
                   >
-                    <div className="bg-[#1f2229] border-b border-white/6 p-4">
-                      <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold text-gray-100">
+                    <div className="bg-white/2 border-b border-white/5 p-6">
+                      <div className="flex justify-between items-center mb-1">
+                        <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] truncate pr-4">
                           {cat.category}
                         </h3>
                         {cat.isVirtual && (
-                          <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full uppercase tracking-wider font-bold">
-                            Transactions Only
+                          <span className="text-[8px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full uppercase tracking-widest font-black border border-blue-500/20">
+                            Virtual
                           </span>
                         )}
                       </div>
-                      <p className="text-2xl font-bold mt-1 text-gray-100">
+                      <p className="text-2xl font-black text-white tracking-tighter">
                         {formatCurrency(total)}
                       </p>
                     </div>
                     <div className="p-4">
-                      <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                      <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
                         {hasBucket && cat.amount > 0 && (
-                          <div className="flex justify-between items-center p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                          <div className="flex justify-between items-center p-3 bg-blue-500/5 rounded-xl border border-blue-500/10 group/item hover:bg-blue-500/10 transition-colors">
                             <div>
-                              <p className="font-bold text-blue-400">
+                              <p className="text-xs font-black text-blue-500 tracking-tight">
                                 {formatCurrency(cat.amount)}
                               </p>
-                              <p className="text-[10px] text-blue-500/60 font-medium uppercase">
-                                Monthly Bucket
+                              <p className="text-[8px] text-blue-500/40 font-black uppercase tracking-widest">
+                                Monthly Budget
                               </p>
                             </div>
                             <button
                               onClick={() => handleDeleteCategory(cat._id)}
-                              className="p-2 text-gray-500 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all"
+                              className="p-2 text-gray-700 hover:text-red-500 transition-colors"
                             >
-                              <IoTrashOutline size={18} />
+                              <IoTrashOutline size={16} />
                             </button>
                           </div>
                         )}
@@ -439,30 +423,25 @@ const Expense = () => {
                         {actualExpenses.map((expense) => (
                           <div
                             key={expense._id}
-                            className="flex justify-between items-center p-3 bg-white/2 rounded-xl border border-white/6"
+                            className="flex justify-between items-center p-4 bg-white/2 rounded-xl border border-white/5 hover:bg-white/4 transition-all"
                           >
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-gray-200 truncate">
+                            <div className="flex-1 min-w-0 pr-4">
+                              <p className="text-xs font-black text-white tracking-tight">
                                 {formatCurrency(expense.amount)}
                               </p>
-                              <p className="text-[10px] text-blue-400 font-semibold truncate">
+                              <p className="text-[9px] text-gray-500 font-black truncate tracking-widest uppercase">
                                 {expense.title}
                               </p>
-                              {expense.description && (
-                                <p className="text-[10px] text-gray-500 truncate mt-0.5">
-                                  {expense.description}
-                                </p>
-                              )}
                             </div>
-                            <span className="text-[10px] text-gray-500 font-medium whitespace-nowrap ml-2">
+                            <span className="text-[8px] text-gray-700 font-black uppercase tracking-widest tabular-nums">
                               {new Date(expense.date).toLocaleDateString()}
                             </span>
                           </div>
                         ))}
 
                         {cat.amount === 0 && actualExpenses.length === 0 && (
-                          <p className="text-gray-400 text-center py-6 text-sm italic">
-                            No spend recorded
+                          <p className="text-[10px] text-gray-600 text-center py-8 font-black uppercase tracking-widest opacity-50">
+                            No Records Found
                           </p>
                         )}
                       </div>
@@ -485,35 +464,34 @@ const Expense = () => {
               </Card>
             )}
             {totalCategoryExpenses > 0 && (
-              <Card className="p-6">
-                <h3 className="text-xl font-bold text-gray-100 mb-6 flex items-center gap-2">
-                  <IoGridOutline className="text-blue-500" />
-                  Category Breakdown
+              <Card className="p-8">
+                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
+                  <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                    <IoGridOutline className="text-blue-500" size={16} />
+                  </div>
+                  System Breakdown
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-8">
                   {allCategoryNames.map((categoryName) => {
                     const total = getCategoryTotal(categoryName);
-                    const percentage =
-                      totalCategoryExpenses > 0
-                        ? (total / totalCategoryExpenses) * 100
-                        : 0;
+                    const percentage = totalCategoryExpenses > 0 ? (total / totalCategoryExpenses) * 100 : 0;
 
                     return (
-                      <div key={categoryName}>
-                        <div className="flex justify-between mb-2 items-end">
-                          <span className="text-gray-300 font-semibold">
+                      <div key={categoryName} className="group">
+                        <div className="flex justify-between mb-3 items-end">
+                          <span className="text-xs font-black text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors">
                             {categoryName}
                           </span>
-                          <span className="text-sm font-bold text-gray-100">
+                          <span className="text-[10px] font-black text-white tracking-widest uppercase">
                             {formatCurrency(total)}{" "}
-                            <span className="text-gray-500 font-medium ml-1">
-                              ({percentage.toFixed(1)}%)
+                            <span className="text-blue-500 ml-2">
+                              {percentage.toFixed(1)}%
                             </span>
                           </span>
                         </div>
-                        <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-white/2 rounded-full h-1 overflow-hidden">
                           <div
-                            className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(59,130,246,0.3)]"
+                            className="bg-blue-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(37,99,235,0.3)]"
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
@@ -563,9 +541,9 @@ const Expense = () => {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 bg-[#1a1d24] border border-white/10 rounded-lg text-gray-100 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150 cursor-pointer"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 cursor-pointer appearance-none shadow-inner"
               >
-                <option value="Other" className="bg-[#1a1d24] text-gray-100">
+                <option value="Other" className="bg-[#09090c] text-white">
                   Other
                 </option>
                 {Array.isArray(userCategories) &&
@@ -575,7 +553,7 @@ const Expense = () => {
                       <option
                         key={cat}
                         value={cat}
-                        className="bg-[#1a1d24] text-gray-100"
+                        className="bg-[#09090c] text-white"
                       >
                         {cat}
                       </option>
@@ -599,7 +577,7 @@ const Expense = () => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Add notes..."
-                className="w-full px-4 py-2.5 bg-white/3 border border-white/6 rounded-lg text-gray-100 focus:outline-none focus:border-blue-500/50 focus:bg-white/5 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
               />
             </div>
@@ -630,7 +608,7 @@ const Expense = () => {
                     category: e.target.value,
                   })
                 }
-                className="w-full px-4 py-2.5 bg-white/3 border border-white/6 rounded-lg text-gray-100 focus:outline-none focus:border-blue-500/50 focus:bg-white/5 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 placeholder="e.g., Transportation, Repair, Equipment"
                 required
               />
@@ -665,7 +643,7 @@ const Expense = () => {
                     description: e.target.value,
                   })
                 }
-                className="w-full px-4 py-2.5 bg-white/3 border border-white/6 rounded-lg text-gray-100 focus:outline-none focus:border-blue-500/50 focus:bg-white/5 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
                 placeholder="Optional notes..."
               />

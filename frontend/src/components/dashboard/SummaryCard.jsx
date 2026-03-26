@@ -10,14 +10,15 @@ const SummaryCard = ({
   bgGradient,
   highlight,
 }) => {
+
   const borderColorMap = {
-    "from-purple-500 to-purple-500": "border-l-blue-500",
+    "from-blue-500 to-blue-500": "border-l-blue-500",
     "from-green-500 to-green-600": "border-l-green-500",
     "from-red-500 to-red-600": "border-l-red-500",
   };
 
   const iconBgMap = {
-    "from-purple-500 to-purple-500": "bg-blue-500/10",
+    "from-blue-500 to-blue-500": "bg-blue-500/10",
     "from-green-500 to-green-600": "bg-green-500/10",
     "from-red-500 to-red-600": "bg-red-500/10",
   };
@@ -32,7 +33,7 @@ const SummaryCard = ({
 
   return (
     <div
-      className={`bg-[#1a1d24] border border-white/6 ${borderColor} border-l-4 rounded-xl p-6 transition-all duration-200 hover:border-white/10 w-full`}
+      className={`bg-[#0e0e12] border border-white/5 ${borderColor} border-l-4 rounded-2xl p-6 transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-black/50 w-full group`}
     >
       <div className="flex items-center justify-between">
         <div>

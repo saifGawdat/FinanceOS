@@ -36,11 +36,12 @@ const LineChart = ({ data }) => {
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#1f2229",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "8px",
+            backgroundColor: "#0e0e12",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
             fontSize: "12px",
             color: "#e5e7eb",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
           }}
           itemStyle={{ color: "#e5e7eb" }}
         />

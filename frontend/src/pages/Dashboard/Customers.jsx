@@ -15,6 +15,8 @@ import {
   IoLogoWhatsapp,
 } from "react-icons/io5";
 import * as XLSX from "xlsx";
+import { formatCurrency } from "../../utils/formatters";
+
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -215,50 +217,49 @@ const Customers = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 mb-8 text-center md:text-left">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-              Customers
+      <div className="p-8 max-w-[1440px] mx-auto">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-12">
+          <div className="text-center lg:text-left w-full lg:w-auto">
+            <h1 className="text-4xl font-black text-white tracking-tight uppercase">
+              Subscriber <span className="text-gray-500">Registry</span>
             </h1>
-            <p className="text-gray-400 mt-2">
-              Monthly subscribers and payment tracking
+            <p className="text-[10px] font-black text-gray-500 mt-2 uppercase tracking-[0.2em]">
+              Monthly recurring revenue and collection lifecycle
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-3 w-full md:w-auto">
-            {/* Month Selector */}
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-              className="px-4 py-2 bg-[#1a1d24] border border-white/10 rounded-xl text-gray-200 shadow-sm focus:outline-none focus:border-blue-500/50 transition-all flex-1 sm:flex-none appearance-none cursor-pointer"
-            >
-              {months.map((m, i) => (
-                <option key={m} value={i + 1} className="bg-[#1a1d24]">
-                  {m}
-                </option>
-              ))}
-            </select>
-
-            {/* Year Selector */}
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="px-4 py-2 bg-[#1a1d24] border border-white/10 rounded-xl text-gray-200 shadow-sm focus:outline-none focus:border-blue-500/50 transition-all flex-1 sm:flex-none appearance-none cursor-pointer"
-            >
-              {years.map((y) => (
-                <option key={y} value={y} className="bg-[#1a1d24]">
-                  {y}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-wrap justify-center lg:justify-end items-center gap-4 w-full lg:w-auto">
+            <div className="flex bg-[#09090c] p-1 rounded-xl border border-white/5 shadow-2xl">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className="px-4 py-2 bg-transparent text-[10px] font-black text-white uppercase tracking-widest focus:outline-none cursor-pointer border-r border-white/5"
+              >
+                {months.map((m, i) => (
+                  <option key={m} value={i + 1} className="bg-[#09090c]">
+                    {m}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="px-4 py-2 bg-transparent text-[10px] font-black text-white uppercase tracking-widest focus:outline-none cursor-pointer"
+              >
+                {years.map((y) => (
+                  <option key={y} value={y} className="bg-[#09090c]">
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <Button
               onClick={handleExport}
               variant="secondary"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="flex items-center gap-2 px-6 py-3 font-black text-[10px] uppercase tracking-widest"
             >
-              <IoDownloadOutline size={20} />
+              <IoDownloadOutline size={16} />
               <span>Export</span>
             </Button>
             <Button
@@ -272,156 +273,153 @@ const Customers = () => {
                 });
                 setShowAddModal(true);
               }}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="flex items-center gap-2 px-6 py-3 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20"
             >
               <IoAddOutline size={20} />
-              <span>Add</span>
+              <span>Provision</span>
             </Button>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex justify-center p-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="flex flex-col items-center justify-center p-24 bg-[#0e0e12] rounded-2xl border border-white/5">
+            <div className="w-12 h-12 border-2 border-white/5 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              Synchronizing Customer Core...
+            </p>
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {customers.map((customer) => {
               const paid = customer.isPaid;
               return (
                 <div
                   key={customer._id}
-                  className={`bg-[#1a1d24] rounded-2xl shadow-lg border-l-4 p-6 transition-all border-white/6 hover:border-blue-500/30 ${
-                    paid ? "border-l-blue-500" : "border-l-red-500"
+                  className={`bg-[#0e0e12] rounded-2xl shadow-2xl border border-white/5 p-8 transition-all group overflow-hidden relative ${
+                    paid ? "hover:border-blue-500/30" : "hover:border-red-500/30"
                   }`}
                 >
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <h3 className="text-xl font-bold text-gray-100">
+                  {/* Status Indicator Bar */}
+                  <div className={`absolute top-0 left-0 w-1 h-full ${paid ? "bg-blue-500" : "bg-red-500"}`} />
+                  
+                  <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 relative z-10">
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-wrap items-center gap-4 mb-6">
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tight">
                           {customer.name}
                         </h3>
                         {customer.brandName && (
-                          <span className="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-xs font-medium border border-white/5">
+                          <span className="bg-[#09090c] text-gray-500 px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border border-white/5">
                             {customer.brandName}
                           </span>
                         )}
-                        {paid ? (
-                          <span className="flex items-center gap-1 text-blue-400 text-sm font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                            <IoCheckmarkCircleOutline size={18} />
-                            Paid
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1 text-red-400 text-sm font-semibold bg-red-500/10 px-2 py-0.5 rounded-full">
-                            <IoCloseCircleOutline size={18} />
-                            Unpaid
-                          </span>
-                        )}
+                        <div
+                          className={`flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border shadow-sm ${
+                            paid
+                              ? "bg-blue-500/10 border-blue-500/20 text-blue-500"
+                              : "bg-red-500/10 border-red-500/20 text-red-500"
+                          }`}
+                        >
+                          {paid ? (
+                            <>
+                              <IoCheckmarkCircleOutline size={12} />
+                              Cleared
+                            </>
+                          ) : (
+                            <>
+                              <IoCloseCircleOutline size={12} />
+                              Pending
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-                        <div>
-                          <p className="text-gray-500 mb-1 font-medium">
-                            Phone
-                          </p>
-                          <p className="font-semibold text-gray-300">
-                            {customer.phoneNumber}
+
+                      <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Identification</p>
+                          <p className="text-xs font-bold text-gray-300">{customer.phoneNumber}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Yield</p>
+                          <p className="text-lg font-black text-blue-500">
+                            {formatCurrency(parseFloat(customer.monthlyAmount))}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-gray-500 mb-1 font-medium">
-                            Monthly
-                          </p>
-                          <p className="font-bold text-blue-400 text-lg">
-                            £
-                            {parseFloat(
-                              customer.monthlyAmount,
-                            ).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="text-gray-500 mb-1 font-medium">
-                            Total Spent
-                          </p>
-                          <p className="text-gray-400 font-medium italic">
-                            Tracking...
-                          </p>
-                        </div>
-                        <div className="col-span-1">
-                          <p className="text-gray-500 mb-1 font-medium">
-                            Last Payment
-                          </p>
-                          <p className="text-gray-300">
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Last Activity</p>
+                          <p className="text-xs font-bold text-gray-300">
                             {customer.lastPaidDate
-                              ? new Date(
-                                  customer.lastPaidDate,
-                                ).toLocaleDateString()
-                              : "Never"}
+                              ? new Date(customer.lastPaidDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                              : "No Record"}
                           </p>
                         </div>
-                        <div className="col-span-1">
-                          <p className="text-gray-500 mb-1 font-medium">
-                            Deadline
-                          </p>
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">SLA Deadline</p>
                           <p
-                            className={`font-semibold ${
+                            className={`text-xs font-black ${
                               !paid &&
                               customer.paymentDeadline &&
                               new Date(customer.paymentDeadline) < new Date()
-                                ? "text-red-400"
+                                ? "text-red-500"
                                 : "text-gray-300"
                             }`}
                           >
                             {customer.paymentDeadline
-                              ? new Date(
-                                  customer.paymentDeadline,
-                                ).toLocaleDateString()
-                              : "No Deadline"}
+                              ? new Date(customer.paymentDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                              : "Unrestricted"}
                           </p>
+                        </div>
+                        <div className="space-y-1 hidden lg:block">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">LTV Analysis</p>
+                          <p className="text-xs font-bold text-gray-500 italic">Processing...</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    <div className="flex items-center gap-3 w-full xl:w-auto border-t xl:border-t-0 border-white/5 pt-6 xl:pt-0">
                       {!paid ? (
                         <Button
                           onClick={() => handlePay(customer._id)}
-                          className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 px-4 py-2"
+                          className="flex-1 xl:flex-none bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-3 px-8 py-3 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-600/20"
                         >
-                          <IoCashOutline size={20} />
-                          <span>Pay</span>
+                          <IoCashOutline size={18} />
+                          <span>Clear Due</span>
                         </Button>
                       ) : (
                         <Button
                           onClick={() => handleUnpay(customer._id)}
                           variant="secondary"
-                          className="text-red-400 hover:text-red-300 border-red-500/20 hover:bg-red-500/5 px-4 py-2"
+                          className="flex-1 xl:flex-none text-red-500 hover:bg-red-500/10 border-red-500/20 flex items-center justify-center gap-3 px-8 py-3 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all"
                         >
-                          <IoCloseCircleOutline size={20} />
-                          <span>Undo</span>
+                          <IoCloseCircleOutline size={18} />
+                          <span>Revert</span>
                         </Button>
                       )}
-                      <a
-                        href={`https://wa.me/${customer.phoneNumber.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 text-gray-500 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition-all"
-                        title="Message on WhatsApp"
-                      >
-                        <IoLogoWhatsapp size={20} />
-                      </a>
-                      <button
-                        onClick={() => handleEdit(customer)}
-                        className="p-2 text-gray-500 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all"
-                        title="Edit customer"
-                      >
-                        <IoPencilOutline size={20} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(customer._id)}
-                        className="p-2 text-gray-500 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all"
-                        title="Remove customer"
-                      >
-                        <IoTrashOutline size={20} />
-                      </button>
+                      <div className="flex gap-2">
+                        <a
+                          href={`https://wa.me/${customer.phoneNumber.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-3 text-gray-500 hover:text-emerald-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
+                          title="WhatsApp Dispatch"
+                        >
+                          <IoLogoWhatsapp size={18} />
+                        </a>
+                        <button
+                          onClick={() => handleEdit(customer)}
+                          className="p-3 text-gray-500 hover:text-blue-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
+                          title="Modify Entry"
+                        >
+                          <IoPencilOutline size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(customer._id)}
+                          className="p-3 text-gray-500 hover:text-red-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
+                          title="Terminate Record"
+                        >
+                          <IoTrashOutline size={18} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -429,59 +427,39 @@ const Customers = () => {
             })}
 
             {customers.length === 0 && (
-              <div className="bg-[#1a1d24] rounded-2xl p-12 text-center border-2 border-dashed border-white/5">
-                <p className="text-gray-500 italic">
-                  No customers found. Add your first customer to get started!
+              <div className="bg-[#0e0e12] rounded-2xl p-24 text-center border-2 border-dashed border-white/5">
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest italic">
+                  Registry is currently void of active subscribers.
                 </p>
               </div>
             )}
 
-            {/* أدوات التحكم في الترقيم - Pagination Controls */}
+            {/* Pagination Controls */}
             {!loading && customers.length > 0 && (
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-4 rounded-2xl border border-white/6 shadow-lg">
-                {/* معلومات الصفحة - Page Info */}
-                <div className="text-sm text-gray-400">
-                  <span className="font-medium">Showing</span>{" "}
-                  <span className="font-bold text-blue-400">
-                    {customers.length}
-                  </span>{" "}
-                  <span className="font-medium">of</span>{" "}
-                  <span className="font-bold text-blue-400">{totalItems}</span>{" "}
-                  <span className="font-medium">customers</span>
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-[#0e0e12] p-6 rounded-2xl border border-white/5 shadow-2xl">
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                  Index <span className="text-blue-500">{customers.length}</span> / <span className="text-blue-500">{totalItems}</span> Entities
                 </div>
 
-                {/* أزرار التنقل - Navigation Buttons */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={currentPage === 1 || paginationLoading}
-                    className="px-4 py-2 bg-white/3 border border-white/10 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="p-3 bg-[#09090c] border border-white/5 text-gray-400 rounded-xl font-black transition-all hover:text-white disabled:opacity-20 flex items-center justify-center min-w-[50px] group"
                   >
-                    <span>←</span>
-                    <span className="hidden sm:inline">Previous</span>
+                    <span className="group-hover:-translate-x-1 transition-transform">←</span>
                   </button>
 
-                  <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl font-bold min-w-[120px] text-center">
-                    {paginationLoading ? (
-                      <span className="text-xs">Loading...</span>
-                    ) : (
-                      <span>
-                        Page {currentPage} of {totalPages}
-                      </span>
-                    )}
+                  <div className="px-6 py-2.5 bg-blue-500/5 border border-blue-500/10 text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest min-w-[150px] text-center shadow-inner">
+                    {paginationLoading ? "QUERYING..." : `Sector ${currentPage} OF ${totalPages}`}
                   </div>
 
                   <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                     disabled={currentPage >= totalPages || paginationLoading}
-                    className="px-4 py-2 bg-white/3 border border-white/10 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="p-3 bg-[#09090c] border border-white/5 text-gray-400 rounded-xl font-black transition-all hover:text-white disabled:opacity-20 flex items-center justify-center min-w-[50px] group"
                   >
-                    <span className="hidden sm:inline">Next</span>
-                    <span>→</span>
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </button>
                 </div>
               </div>
@@ -490,7 +468,7 @@ const Customers = () => {
         )}
       </div>
 
-      {/* Add Modal */}
+      {/* Forms & Modals */}
       <Modal
         isOpen={showAddModal}
         onClose={() => {
@@ -505,78 +483,68 @@ const Customers = () => {
             paymentDeadline: "",
           });
         }}
-        title={editingCustomer ? "Edit Customer" : "Add New Customer"}
+        title={editingCustomer ? "Calibrate Subscriber" : "Provision New Entity"}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm font-medium">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest animate-pulse">
               {error}
             </div>
           )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Legal Identity"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Full Entity Name"
+            />
+            <Input
+              label="Trade Marker"
+              value={formData.brandName}
+              onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
+              placeholder="Commercial Brand"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Communication Line"
+              required
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              placeholder="+00 000 000 000"
+            />
+            <Input
+              label="Monthly Commitment"
+              required
+              type="number"
+              value={formData.monthlyAmount}
+              onChange={(e) => setFormData({ ...formData, monthlyAmount: e.target.value })}
+              placeholder="0.00"
+            />
+          </div>
           <Input
-            label="Customer Name"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g. John Doe"
-          />
-          <Input
-            label="Brand/Company Name"
-            value={formData.brandName}
-            onChange={(e) =>
-              setFormData({ ...formData, brandName: e.target.value })
-            }
-            placeholder="e.g. Acme Corp"
-          />
-          <Input
-            label="Phone Number"
-            required
-            value={formData.phoneNumber}
-            onChange={(e) =>
-              setFormData({ ...formData, phoneNumber: e.target.value })
-            }
-            placeholder="e.g. +1234567890"
-          />
-          <Input
-            label="Monthly Amount"
-            required
-            type="number"
-            value={formData.monthlyAmount}
-            onChange={(e) =>
-              setFormData({ ...formData, monthlyAmount: e.target.value })
-            }
-            placeholder="e.g. 500"
-          />
-          <Input
-            label="Payment Deadline"
+            label="SLA Deadline"
             type="date"
             value={formData.paymentDeadline}
-            onChange={(e) =>
-              setFormData({ ...formData, paymentDeadline: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, paymentDeadline: e.target.value })}
           />
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-4 pt-6">
             <Button
               variant="secondary"
               onClick={() => setShowAddModal(false)}
-              className="flex-1"
+              className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest"
             >
-              Cancel
+              Abort
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting
-                ? editingCustomer
-                  ? "Saving..."
-                  : "Creating..."
-                : editingCustomer
-                  ? "Save Changes"
-                  : "Create"}
+            <Button type="submit" disabled={isSubmitting} className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-500/20">
+              {isSubmitting ? "PROCESSING..." : editingCustomer ? "SYNC CHANGES" : "PROVISION"}
             </Button>
           </div>
         </form>
       </Modal>
 
-      {/* Confirmation Modal for Customer Actions */}
+      {/* Confirmation Modal */}
       <Modal
         isOpen={confirmModal.open}
         onClose={() => {
@@ -584,51 +552,39 @@ const Customers = () => {
             setConfirmModal({ open: false, type: null, customerId: null });
           }
         }}
-        title={
-          confirmModal.type === "pay"
-            ? "Confirm Payment"
-            : confirmModal.type === "unpay"
-              ? "Undo Payment"
-              : "Remove Customer"
-        }
+        title="Override Confirmation"
       >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-300">
+        <div className="space-y-6">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wide leading-relaxed">
             {confirmModal.type === "pay" && (
               <>
-                Confirm payment for this customer for the selected month (
-                <span className="font-semibold text-blue-400">
+                Confirm capital injection for the period{" "}
+                <span className="text-blue-500 font-black">
                   {selectedMonth}/{selectedYear}
-                </span>
-                )?
+                </span>{" "}
+                from this entity?
               </>
             )}
             {confirmModal.type === "unpay" && (
               <>
-                Are you sure you want to mark this customer as{" "}
-                <span className="font-semibold text-red-400">UNPAID</span> for
-                this month? This will remove the payment from income.
+                Confirm ledger reversal? This will treat the current period as{" "}
+                <span className="text-red-500 font-black">UNSETTLED</span>.
               </>
             )}
             {confirmModal.type === "delete" && (
               <>
-                Are you sure you want to{" "}
-                <span className="font-semibold text-red-400">
-                  remove this customer
-                </span>
-                ? This will delete their subscription record for all months.
+                Initiate record termination? This action is{" "}
+                <span className="text-red-500 font-black">IRREVERSIBLE</span> and will purge historical subscription data.
               </>
             )}
           </p>
 
-          <div className="flex justify-end gap-3 mt-2">
+          <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
-                setConfirmModal({ open: false, type: null, customerId: null })
-              }
-              className="px-4"
+              onClick={() => setConfirmModal({ open: false, type: null, customerId: null })}
+              className="px-8 py-3 font-black uppercase text-[10px] tracking-widest"
               disabled={isConfirming}
             >
               Cancel
@@ -636,10 +592,12 @@ const Customers = () => {
             <Button
               type="button"
               onClick={confirmCustomerAction}
-              className="px-4"
+              className={`px-8 py-3 font-black uppercase text-[10px] tracking-widest shadow-lg ${
+                confirmModal.type === "delete" ? "bg-red-600 hover:bg-red-700 shadow-red-500/20" : "shadow-blue-500/20"
+              }`}
               disabled={isConfirming}
             >
-              {isConfirming ? "Processing..." : "Confirm"}
+              {isConfirming ? "QUERYING..." : "CONFIRM"}
             </Button>
           </div>
         </div>

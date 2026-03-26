@@ -3,6 +3,7 @@ import { formatCurrency, formatDate } from "../../utils/formatters";
 import { IoArrowUp, IoArrowDown } from "react-icons/io5";
 
 const RecentTransactions = ({ transactions }) => {
+
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -12,11 +13,11 @@ const RecentTransactions = ({ transactions }) => {
   }
 
   return (
-    <div className="space-y-2 min-w-full">
+    <div className="space-y-0.5 min-w-full">
       {transactions.map((transaction) => (
         <div
           key={transaction._id}
-          className="flex items-center justify-between p-4 bg-white/2 border-b border-white/6 hover:bg-white/4 transition-all duration-150"
+          className="flex items-center justify-between p-4 bg-transparent border-b border-white/5 hover:bg-white/3 transition-all duration-300 group rounded-xl"
         >
           <div className="flex items-center gap-3">
             <div

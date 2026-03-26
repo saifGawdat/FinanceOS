@@ -161,7 +161,7 @@ const Income = () => {
           />
           {/* أدوات التحكم في الترقيم - Pagination Controls */}
           {!loading && incomes.length > 0 && (
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-4 rounded-xl border border-white/6">
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
               {/* معلومات الصفحة - Page Info */}
               <div className="text-sm text-gray-400">
                 <span className="font-medium">Showing</span>{" "}
@@ -180,7 +180,7 @@ const Income = () => {
                     setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={currentPage === 1 || paginationLoading}
-                  className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
                   <span>←</span>
                   <span className="hidden sm:inline">Previous</span>
@@ -201,7 +201,7 @@ const Income = () => {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={currentPage >= totalPages || paginationLoading}
-                  className="px-4 py-2 bg-white/3 border border-white/6 text-gray-300 rounded-xl font-medium transition-all hover:bg-white/6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
                   <span className="hidden sm:inline">Next</span>
                   <span>→</span>
@@ -259,7 +259,7 @@ const Income = () => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Add notes..."
-                className="w-full px-4 py-3 bg-white/3 border border-white/6 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/5 focus:ring-2 focus:ring-blue-500/20 transition-all duration-150"
+                className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
               />
             </div>

@@ -200,9 +200,27 @@ export class DashboardService {
 
     const pieChartData = Object.keys(pieDataMap)
       .map((name) => ({ name, value: pieDataMap[name] }))
-      .filter((item) => item.value > 0);
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.value - a.value);
 
-    return { barChartData, pieChartData, lineChartData: dailyTimelineData };
+    // Income breakdown by category
+    const incomePieDataMap: any = {};
+    incomes.forEach((inc) => {
+      const cat = inc.category || "Other";
+      incomePieDataMap[cat] = (incomePieDataMap[cat] || 0) + inc.amount;
+    });
+
+    const incomePieChartData = Object.keys(incomePieDataMap)
+      .map((name) => ({ name, value: incomePieDataMap[name] }))
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    return {
+      barChartData,
+      pieChartData,
+      lineChartData: dailyTimelineData,
+      incomePieChartData,
+    };
   }
 
   private async getAllTimeChartData(userId: string): Promise<any> {
@@ -274,7 +292,23 @@ export class DashboardService {
         return acc;
       }, []);
 
-    return { barChartData, pieChartData, lineChartData: timelineData };
+    const incomePieDataMap: any = {};
+    incomes.forEach((inc) => {
+      const cat = inc.category || "Other";
+      incomePieDataMap[cat] = (incomePieDataMap[cat] || 0) + inc.amount;
+    });
+
+    const incomePieChartData = Object.keys(incomePieDataMap).map((name) => ({
+      name,
+      value: incomePieDataMap[name],
+    }));
+
+    return {
+      barChartData,
+      pieChartData,
+      lineChartData: timelineData,
+      incomePieChartData,
+    };
   }
 
   async getRecentTransactions(
