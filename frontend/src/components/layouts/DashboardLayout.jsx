@@ -38,9 +38,9 @@ const DashboardLayout = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#060608] text-gray-300 antialiased">
-      {/* Mobile header */}
-      <div className="lg:hidden bg-[#09090c] border-b border-white/5 p-4 flex justify-between items-center sticky top-0 z-30">
+    <div className="h-screen bg-[#060608] text-gray-300 antialiased flex flex-col overflow-hidden">
+      {/* Mobile header - Takes up fixed height when visible */}
+      <div className="lg:hidden bg-[#09090c] border-b border-white/5 p-4 flex justify-between items-center z-30 shrink-0">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-1.5 hover:bg-white/5 rounded-lg transition-all text-gray-400"
@@ -53,11 +53,11 @@ const DashboardLayout = ({ children }) => {
         <div className="w-10"></div>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
           className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#09090c] border-r border-white/5 transform transition-transform duration-300 ease-in-out h-screen lg:h-auto lg:min-h-screen flex flex-col
+          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#09090c] border-r border-white/5 transform transition-transform duration-300 ease-in-out h-full flex flex-col
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
         >
@@ -85,7 +85,7 @@ const DashboardLayout = ({ children }) => {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
                         location.pathname === item.path
                           ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                          : "text-gray-500 hover:text-gray-200 hover:bg-white/[0.03]"
+                          : "text-gray-500 hover:text-gray-200 hover:bg-white/3"
                       }`}
                     >
                       <item.icon size={18} className={location.pathname === item.path ? "" : "group-hover:text-blue-400 transition-colors"} />
@@ -126,8 +126,8 @@ const DashboardLayout = ({ children }) => {
           />
         )}
 
-        {/* Main content - Constrained Width Fix */}
-        <main className="flex-1 bg-[#060608] min-h-screen overflow-x-hidden">
+        {/* Main content - Scrollable area */}
+        <main className="flex-1 bg-[#060608] h-full overflow-y-auto custom-scrollbar">
           <div className="max-w-[1440px] mx-auto p-6 md:p-8 lg:p-10">
             {children}
           </div>

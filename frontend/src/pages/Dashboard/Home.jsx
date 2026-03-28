@@ -64,7 +64,7 @@ const Home = () => {
 
   return (
     <DashboardLayout>
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-5 gap-8 ">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-extrabold text-white tracking-tight">
@@ -149,7 +149,7 @@ const Home = () => {
         <div className="lg:col-span-1">
           <Card title="Spending Rankings" subtitle="Highest expense categories" className="h-full">
             <div className="space-y-4">
-              {chartData.pieChartData.slice(0, 5).map((item, index) => (
+              {chartData.pieChartData.slice(0, 10).map((item, index) => (
                 <div key={index} className="flex justify-between items-center bg-white/3 p-3 rounded-xl border border-white/5">
                   <span className="text-gray-400 text-xs font-bold uppercase">{item.name}</span>
                   <span className="text-white text-sm font-black tracking-tight font-mono">
