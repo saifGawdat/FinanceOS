@@ -87,6 +87,7 @@ export class MonthlySummaryService {
       user: userId,
       month,
       year,
+      employee: { $in: activeEmployees.map((emp) => emp._id) },
     });
     const totalBonuses = transactions
       .filter((t) => t.type === "BONUS")

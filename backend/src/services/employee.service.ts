@@ -87,9 +87,14 @@ export class EmployeeService {
     data: UpdateEmployeeDTO,
   ): Promise<IEmployee> {
     const employee = await Employee.findOne({ _id: employeeId, user: userId });
-
+    
     if (!employee) {
       throw new NotFoundError("Employee not found");
+    }
+
+    // Only allow explicit reactivation in this update if it's inactive
+    if (!employee.isActive && data.isActive !== true) {
+      throw new ValidationError("Cannot update inactive employee");
     }
 
     if (data.name !== undefined) employee.name = data.name;
@@ -118,6 +123,14 @@ export class EmployeeService {
     // Soft delete
     employee.isActive = false;
     await employee.save();
+
+    // Trigger recalculation for current month
+    const now = new Date();
+    await this.monthlySummaryService.calculate(
+      userId,
+      now.getMonth() + 1,
+      now.getFullYear(),
+    );
   }
 
   async addTransaction(
@@ -131,6 +144,10 @@ export class EmployeeService {
 
     if (!employee) {
       throw new NotFoundError("Employee not found");
+    }
+
+    if (!employee.isActive) {
+      throw new ValidationError("Cannot add adjustments for inactive employee");
     }
 
     const transaction = new EmployeeTransaction({

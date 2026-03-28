@@ -517,13 +517,13 @@ const Employee = () => {
 
         {/* أدوات التحكم في الترقيم (Pagination Controls) */}
         {/* Pagination Controls */}
-        {!loading && employees.length > 0 && (
+        {!loading && employees.filter((employee) => employee.isActive).length > 0 && (
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-5 rounded-2xl border border-white/5 shadow-2xl shadow-black/80">
             {/* معلومات الصفحة - Page Information */}
             <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest text-center sm:text-left">
               <span>Showing</span>{" "}
               <span className="text-blue-500 mx-1">
-                {employees.length}
+                {employees.filter((employee) => employee.isActive).length}
               </span>{" "}
               <span>of</span>{" "}
               <span className="text-blue-500 mx-1">{totalItems}</span>{" "}
@@ -821,8 +821,10 @@ const Employee = () => {
                           }
                           required
                         >
-                          <option value="" className="bg-[#09090c]">Select Employee</option>
-                          {employees.map((emp) => (
+                          {employees.filter((employee) => employee.isActive).length === 0 && (
+                            <option value="" className="bg-[#09090c]">No Active Employees</option>
+                          )}
+                          {employees.filter((employee) => employee.isActive).map((emp) => (
                             <option
                               key={emp._id}
                               value={emp._id}
