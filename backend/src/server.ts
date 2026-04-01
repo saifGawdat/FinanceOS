@@ -37,6 +37,7 @@ app.get("/", (_req, res) => {
 });
 
 // Debug: Test API key
+
 app.get("/api/debug/test-gemini", async (_req, res) => {
   try {
     const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -52,11 +53,6 @@ app.get("/api/debug/test-gemini", async (_req, res) => {
     const result = await model.generateContent("Say 'API is working'");
     const text = result.response.text();
   
-    app.use((req, res, next) => {
-      res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-      next();
-    });
-    
     return res.json({ success: true, message: text });
   } catch (error: any) {
     console.error("Gemini API test error:", error);
