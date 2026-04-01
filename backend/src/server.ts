@@ -45,13 +45,18 @@ app.get("/api/debug/test-gemini", async (_req, res) => {
     if (!apiKey) {
       return res.status(400).json({ error: "VITE_GEMINI_API_KEY not set" });
     }
-
+    
     const client = new GoogleGenerativeAI(apiKey);
     const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+    
     const result = await model.generateContent("Say 'API is working'");
     const text = result.response.text();
-
+  
+    app.use((req, res, next) => {
+      res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+      next();
+    });
+    
     return res.json({ success: true, message: text });
   } catch (error: any) {
     console.error("Gemini API test error:", error);
