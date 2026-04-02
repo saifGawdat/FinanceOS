@@ -41,3 +41,26 @@ export const exportExpenseToExcel = (expenses) => {
 
   exportToExcel(data, "expense-report.xlsx", "Expenses");
 };
+
+export const exportGoalsToExcel = (goals) => {
+  const data = goals.map((goal) => {
+    const target = Number(goal?.targetAmount || 0);
+    const current = Number(goal?.currentAmount || 0);
+    const progress = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+
+    return {
+      Title: goal?.title || "-",
+      "Target Amount": target,
+      "Current Amount": current,
+      "Progress (%)": Number(progress.toFixed(2)),
+      "Target Date": goal?.targetDate
+        ? new Date(goal.targetDate).toLocaleDateString()
+        : "-",
+      Created: goal?.createdAt
+        ? new Date(goal.createdAt).toLocaleDateString()
+        : "-",
+    };
+  });
+
+  exportToExcel(data, "goals-report.xlsx", "Goals");
+};

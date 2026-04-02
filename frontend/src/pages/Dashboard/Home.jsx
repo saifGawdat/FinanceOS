@@ -6,6 +6,7 @@ import BarChart from "../../components/charts/BarChart";
 import PieChart from "../../components/charts/PieChart";
 import LineChart from "../../components/charts/LineChart";
 import SavingsRateChart from "../../components/charts/SavingsRateChart";
+import GoalsProgressChart from "../../components/charts/GoalsProgressChart";
 import RecentTransactions from "../../components/dashboard/RecentTransactions";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
 import {
@@ -13,6 +14,7 @@ import {
   useGetDashboardCharts,
   useGetDashboardRecent,
 } from "../../hooks/queries/useDashboard";
+import { useGetGoals } from "../../hooks/queries/useGoals";
 import {
   IoCalendarOutline,
   IoTrendingUpOutline,
@@ -29,12 +31,14 @@ const Home = () => {
   const { data: statsData, isLoading: isLoadingStats } = useGetDashboardStats(month, year);
   const { data: chartDataData, isLoading: isLoadingCharts } = useGetDashboardCharts(month, year);
   const { data: recentTransactionsData, isLoading: isLoadingRecent } = useGetDashboardRecent(month, year);
+  const { data: goalsData, isLoading: isLoadingGoals } = useGetGoals();
 
-  const loading = isLoadingStats || isLoadingCharts || isLoadingRecent;
+  const loading = isLoadingStats || isLoadingCharts || isLoadingRecent || isLoadingGoals;
 
   const stats = statsData || { totalIncome: 0, totalExpense: 0, balance: 0 };
   const chartData = chartDataData || { barChartData: [], pieChartData: [], lineChartData: [], incomePieChartData: [] };
   const recentTransactions = recentTransactionsData || [];
+  const goals = goalsData || [];
 
   const savingsRate = stats.totalIncome > 0 
     ? ((stats.totalIncome - stats.totalExpense) / stats.totalIncome) * 100 
@@ -147,20 +151,8 @@ const Home = () => {
           </Card>
         </div>
         <div className="lg:col-span-1">
-          <Card title="Spending Rankings" subtitle="Highest expense categories" className="h-full">
-            <div className="space-y-4">
-              {chartData.pieChartData.slice(0, 10).map((item, index) => (
-                <div key={index} className="flex justify-between items-center bg-white/3 p-3 rounded-xl border border-white/5">
-                  <span className="text-gray-400 text-xs font-bold uppercase">{item.name}</span>
-                  <span className="text-white text-sm font-black tracking-tight font-mono">
-                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(item.value)}
-                  </span>
-                </div>
-              ))}
-              {chartData.pieChartData.length === 0 && (
-                <p className="text-gray-600 text-xs italic text-center py-10">No spending data for this period</p>
-              )}
-            </div>
+          <Card title="Goals Progress" subtitle="Lowest completion first" className="h-full">
+            <GoalsProgressChart goals={goals} limit={6} height={220} />
           </Card>
         </div>
       </div>

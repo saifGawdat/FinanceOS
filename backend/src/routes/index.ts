@@ -8,6 +8,7 @@ import expenseCategoryRoutes from "./expense-category.routes";
 import monthlySummaryRoutes from "./monthly-summary.routes";
 import dashboardRoutes from "./dashboard.routes";
 import aiRoutes from "./ai.routes";
+import goalsRoutes from "./goals.routes";
 
 const router = Router();
 
@@ -20,5 +21,5 @@ router.use("/expense-category", expenseCategoryRoutes);
 router.use("/monthly-summary", monthlySummaryRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/ai", aiRoutes);
-
+router.use("/goals", goalsRoutes);
 export default router;
