@@ -20,4 +20,11 @@ export const queryKeys = {
     all: ["monthlySummary"],
     detail: (month, year) => ["monthlySummary", "detail", month, year],
   },
+
+  // Goals Entity
+  goals: {
+    all: ["goals"],
+    list: (filters) => ["goals", "list", filters],
+    detail: (id) => ["goals", "detail", id],
+  },
 };

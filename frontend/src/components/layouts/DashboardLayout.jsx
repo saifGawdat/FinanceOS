@@ -12,6 +12,7 @@ import {
   IoCashOutline,
   IoStatsChartOutline,
   IoSettingsOutline,
+  IoTrophyOutline,
 } from "react-icons/io5";
 
 const DashboardLayout = ({ children }) => {
@@ -30,6 +31,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/dashboard", icon: IoHomeOutline, label: "Dashboard" },
     { path: "/income", icon: IoWalletOutline, label: "Income" },
     { path: "/expense", icon: IoCartOutline, label: "Expenses" },
+    { path: "/goals", icon: IoTrophyOutline, label: "Goals" },
     { path: "/employees", icon: IoPeopleOutline, label: "Employees" },
     { path: "/monthly-salaries", icon: IoCashOutline, label: "Salaries" },
     { path: "/profit-summary", icon: IoStatsChartOutline, label: "Profit" },
