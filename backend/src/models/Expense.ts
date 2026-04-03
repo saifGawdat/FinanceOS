@@ -7,6 +7,8 @@ export interface IExpense extends Document {
   category: string;
   date: Date;
   description?: string;
+  isRecurring?: boolean;
+  recurringId?: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
@@ -38,6 +40,14 @@ const expenseSchema = new Schema<IExpense>({
   description: {
     type: String,
     trim: true,
+  },
+  isRecurring: {
+    type: Boolean,
+    default: false,
+  },
+  recurringId: {
+    type: Schema.Types.ObjectId,
+    ref: "RecurringTransaction",
   },
   createdAt: {
     type: Date,

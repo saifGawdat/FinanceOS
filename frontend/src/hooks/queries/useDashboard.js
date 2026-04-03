@@ -11,17 +11,23 @@ export const dashboardKeys = {
 };
 
 const fetchStats = async (month, year) => {
-  const { data } = await API.get("/dashboard/stats", { params: { month, year } });
+  const { data } = await API.get("/dashboard/stats", {
+    params: { month, year },
+  });
   return data;
 };
 
 const fetchChartData = async (month, year) => {
-  const { data } = await API.get("/dashboard/chart-data", { params: { month, year } });
+  const { data } = await API.get("/dashboard/chart-data", {
+    params: { month, year },
+  });
   return data;
 };
 
 const fetchRecentTransactions = async (month, year) => {
-  const { data } = await API.get("/dashboard/recent", { params: { month, year } });
+  const { data } = await API.get("/dashboard/recent", {
+    params: { month, year },
+  });
   return data;
 };
 

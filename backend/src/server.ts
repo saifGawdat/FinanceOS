@@ -4,6 +4,8 @@ import cors from "cors";
 import { connectDB } from "./config/database";
 import routes from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
+import cron from "node-cron";
+import { RecurringProcessorService } from "./services/recurring-processor.service";
 
 const app = express();
 
@@ -81,6 +83,19 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Recurring transactions processing
+  const recurringProcessor = new RecurringProcessorService();
+
+  // Run once on startup
+  console.log("Running initial recurring transactions processing...");
+  await recurringProcessor.processAll();
+
+  // Schedule to run every day at midnight (00:00)
+  cron.schedule("0 0 * * *", async () => {
+    console.log("Running scheduled recurring transactions processing...");
+    await recurringProcessor.processAll();
+  });
 });

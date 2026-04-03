@@ -6,7 +6,11 @@ import Button from "../../components/ui/Button";
 import TransactionList from "../../components/dashboard/TransactionList";
 import Modal from "../../components/ui/Modal";
 import MonthYearSelector from "../../components/ui/MonthYearSelector";
-import { useGetIncomes, useAddIncome, useDeleteIncome } from "../../hooks/queries/useIncome";
+import {
+  useGetIncomes,
+  useAddIncome,
+  useDeleteIncome,
+} from "../../hooks/queries/useIncome";
 import { formatCurrency } from "../../utils/formatters";
 import { exportIncomeToExcel } from "../../utils/exportToExcel";
 import { IoAddCircleOutline, IoDownloadOutline } from "react-icons/io5";
@@ -16,7 +20,7 @@ const Income = () => {
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -31,11 +35,15 @@ const Income = () => {
   const [deleteIncomeId, setDeleteIncomeId] = useState(null);
 
   // Queries
-  const { data: incomesData, isLoading: loading, isFetching: paginationLoading } = useGetIncomes({
+  const {
+    data: incomesData,
+    isLoading: loading,
+    isFetching: paginationLoading,
+  } = useGetIncomes({
     month,
     year,
     page: currentPage,
-    limit: itemsPerPage
+    limit: itemsPerPage,
   });
 
   const incomes = incomesData?.data || [];
@@ -52,7 +60,7 @@ const Income = () => {
   useEffect(() => {
     // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
     const refreshData = () => {
-       // React Query automatically handles refetching on invalidation
+      // React Query automatically handles refetching on invalidation
     };
     window.addEventListener("refreshData", refreshData);
     return () => window.removeEventListener("refreshData", refreshData);
@@ -65,7 +73,7 @@ const Income = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
+
     addIncomeMutation.mutate(formData, {
       onSuccess: () => {
         setIsModalOpen(false);
@@ -80,7 +88,7 @@ const Income = () => {
       },
       onError: (err) => {
         console.error("Error adding income:", err);
-      }
+      },
     });
   };
 
@@ -90,12 +98,12 @@ const Income = () => {
 
   const confirmDeleteIncome = () => {
     if (!deleteIncomeId) return;
-    
+
     deleteIncomeMutation.mutate(deleteIncomeId, {
       onSuccess: () => setDeleteIncomeId(null),
       onError: (err) => {
         console.error("Error deleting income:", err);
-      }
+      },
     });
   };
 

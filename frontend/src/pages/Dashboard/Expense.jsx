@@ -36,7 +36,7 @@ const Expense = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -44,7 +44,7 @@ const Expense = () => {
     date: new Date().toISOString().split("T")[0],
     description: "",
   });
-  
+
   const [activeTab, setActiveTab] = useState("expenses");
 
   // Category specific state
@@ -60,13 +60,17 @@ const Expense = () => {
   const [deleteCategoryId, setDeleteCategoryId] = useState(null);
 
   // Queries
-  const { data: expensesData, isLoading: loading, isFetching: paginationLoading } = useGetExpenses({ 
-    month, 
-    year, 
-    page: currentPage, 
-    limit: itemsPerPage 
+  const {
+    data: expensesData,
+    isLoading: loading,
+    isFetching: paginationLoading,
+  } = useGetExpenses({
+    month,
+    year,
+    page: currentPage,
+    limit: itemsPerPage,
   });
-  
+
   const expenses = expensesData?.data || [];
   const totalPages = expensesData?.pagination?.totalPages || 1;
   const totalItems = expensesData?.pagination?.totalItems || 0;
@@ -81,14 +85,17 @@ const Expense = () => {
   const deleteExpenseCategoryMutation = useDeleteExpenseCategory();
   const copyPreviousMonthCategoriesMutation = useCopyPreviousMonthCategories();
 
-  const isSubmitting = addExpenseMutation.isPending || copyPreviousMonthCategoriesMutation.isPending;
-  const isDeleting = deleteExpenseMutation.isPending || deleteExpenseCategoryMutation.isPending;
+  const isSubmitting =
+    addExpenseMutation.isPending ||
+    copyPreviousMonthCategoriesMutation.isPending;
+  const isDeleting =
+    deleteExpenseMutation.isPending || deleteExpenseCategoryMutation.isPending;
   const isCategorySubmitting = addExpenseCategoryMutation.isPending;
 
   useEffect(() => {
     // Listen for AI-triggered refreshes (kept for compatibility with AIAssistant)
     const refreshData = () => {
-       // React Query automatically handles refetching on invalidation
+      // React Query automatically handles refetching on invalidation
     };
     window.addEventListener("refreshData", refreshData);
     return () => window.removeEventListener("refreshData", refreshData);
@@ -102,7 +109,7 @@ const Expense = () => {
     e.preventDefault();
     if (isSubmitting) return;
     setError("");
-    
+
     addExpenseMutation.mutate(formData, {
       onSuccess: () => {
         setIsModalOpen(false);
@@ -113,13 +120,16 @@ const Expense = () => {
           date: new Date().toISOString().split("T")[0],
           description: "",
         });
-        setCurrentPage(1); 
+        setCurrentPage(1);
       },
       onError: (err) => {
         console.error("Error adding expense:", err);
-        const msg = err.response?.data?.error || err.response?.data?.message || "Failed to add expense. Please check your connection.";
+        const msg =
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          "Failed to add expense. Please check your connection.";
         setError(msg);
-      }
+      },
     });
   };
 
@@ -131,29 +141,35 @@ const Expense = () => {
     exportExpenseToExcel(expenses);
   };
 
-  const totalExpense = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const totalExpense = expenses.reduce(
+    (sum, expense) => sum + Number(expense.amount || 0),
+    0,
+  );
 
   const handleCategorySubmit = (e) => {
     e.preventDefault();
     if (isCategorySubmitting) return;
     setError("");
-    
-    addExpenseCategoryMutation.mutate({
-      category: categoryFormData.category,
-      amount: parseFloat(categoryFormData.amount) || 0,
-      month,
-      year,
-      description: categoryFormData.description,
-    }, {
-      onSuccess: () => {
-        setShowCategoryModal(false);
-        setCategoryFormData({ category: "", amount: "", description: "" });
+
+    addExpenseCategoryMutation.mutate(
+      {
+        category: categoryFormData.category,
+        amount: parseFloat(categoryFormData.amount) || 0,
+        month,
+        year,
+        description: categoryFormData.description,
       },
-      onError: (err) => {
-        console.error("Error adding expense category:", err);
-        setError("Failed to add expense category.");
-      }
-    });
+      {
+        onSuccess: () => {
+          setShowCategoryModal(false);
+          setCategoryFormData({ category: "", amount: "", description: "" });
+        },
+        onError: (err) => {
+          console.error("Error adding expense category:", err);
+          setError("Failed to add expense category.");
+        },
+      },
+    );
   };
 
   const handleDeleteCategory = (id) => {
@@ -162,25 +178,25 @@ const Expense = () => {
 
   const confirmDeleteExpense = () => {
     if (!deleteExpenseId) return;
-    
+
     deleteExpenseMutation.mutate(deleteExpenseId, {
       onSuccess: () => setDeleteExpenseId(null),
       onError: (err) => {
         console.error("Error deleting expense:", err);
         setError("Failed to delete expense");
-      }
+      },
     });
   };
 
   const confirmDeleteCategory = () => {
     if (!deleteCategoryId) return;
-    
+
     deleteExpenseCategoryMutation.mutate(deleteCategoryId, {
       onSuccess: () => setDeleteCategoryId(null),
       onError: (err) => {
         console.error("Error deleting category expense:", err);
         setError("Failed to delete category expense");
-      }
+      },
     });
   };
 
@@ -211,18 +227,21 @@ const Expense = () => {
 
   const confirmCopyPreviousMonthCategories = () => {
     setCopyStatus("");
-    copyPreviousMonthCategoriesMutation.mutate({ month, year }, {
-      onSuccess: () => {
-        setCopyStatus("Categories copied successfully!");
+    copyPreviousMonthCategoriesMutation.mutate(
+      { month, year },
+      {
+        onSuccess: () => {
+          setCopyStatus("Categories copied successfully!");
+        },
+        onError: (err) => {
+          console.error("Error copying categories:", err);
+          setCopyStatus(
+            err.response?.data?.error ||
+              "Failed to copy categories. They might already exist or the previous month is empty.",
+          );
+        },
       },
-      onError: (err) => {
-        console.error("Error copying categories:", err);
-        setCopyStatus(
-          err.response?.data?.error ||
-            "Failed to copy categories. They might already exist or the previous month is empty."
-        );
-      }
-    });
+    );
   };
 
   return (
@@ -341,31 +360,42 @@ const Expense = () => {
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
                 {/* معلومات الصفحة - Page Info */}
                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                  Showing <span className="text-white">{expenses.length}</span> of <span className="text-white">{totalItems}</span> records
+                  Showing <span className="text-white">{expenses.length}</span>{" "}
+                  of <span className="text-white">{totalItems}</span> records
                 </div>
 
                 {/* أزرار التنقل - Navigation Buttons */}
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
                     disabled={currentPage === 1 || paginationLoading}
                     className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
-                    <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
+                    <span className="group-hover:-translate-x-0.5 transition-transform">
+                      ←
+                    </span>
                     <span>Prev</span>
                   </button>
 
                   <div className="px-6 py-3 bg-white/5 border border-white/5 text-white text-[10px] font-black uppercase tracking-widest rounded-xl min-w-[140px] text-center shadow-inner">
-                    {paginationLoading ? "Syncing..." : `Page ${currentPage} / ${totalPages}`}
+                    {paginationLoading
+                      ? "Syncing..."
+                      : `Page ${currentPage} / ${totalPages}`}
                   </div>
 
                   <button
-                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
                     disabled={currentPage >= totalPages || paginationLoading}
                     className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
                     <span>Next</span>
-                    <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform">
+                      →
+                    </span>
                   </button>
                 </div>
               </div>
@@ -474,7 +504,10 @@ const Expense = () => {
                 <div className="space-y-8">
                   {allCategoryNames.map((categoryName) => {
                     const total = getCategoryTotal(categoryName);
-                    const percentage = totalCategoryExpenses > 0 ? (total / totalCategoryExpenses) * 100 : 0;
+                    const percentage =
+                      totalCategoryExpenses > 0
+                        ? (total / totalCategoryExpenses) * 100
+                        : 0;
 
                     return (
                       <div key={categoryName} className="group">

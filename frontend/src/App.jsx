@@ -18,6 +18,7 @@ import Customers from "./pages/Dashboard/Customers";
 import Settings from "./pages/Dashboard/Settings";
 import AIAssistant from "./components/AIAssistant/AIAssistant";
 import Goals from "./pages/Dashboard/Goals";
+import RecurringTransactions from "./pages/Dashboard/RecurringTransactions";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -106,6 +107,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Goals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/recurring"
+          element={
+            <ProtectedRoute>
+              <RecurringTransactions />
             </ProtectedRoute>
           }
         />

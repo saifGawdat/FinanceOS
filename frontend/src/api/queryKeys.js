@@ -6,7 +6,7 @@ export const queryKeys = {
     categories: (month, year) => ["expenses", "categories", month, year],
     uniqueCategories: ["expenses", "uniqueCategories"],
   },
-  
+
   // Income Entity
   income: {
     all: ["income"],
@@ -19,6 +19,12 @@ export const queryKeys = {
   monthlySummary: {
     all: ["monthlySummary"],
     detail: (month, year) => ["monthlySummary", "detail", month, year],
+  },
+
+  // Recurring Transactions
+  recurring: {
+    all: ["recurring"],
+    list: () => ["recurring", "list"],
   },
 
   // Goals Entity

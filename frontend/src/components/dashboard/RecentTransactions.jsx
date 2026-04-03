@@ -3,7 +3,6 @@ import { formatCurrency, formatDate } from "../../utils/formatters";
 import { IoArrowUp, IoArrowDown } from "react-icons/io5";
 
 const RecentTransactions = ({ transactions }) => {
-
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">

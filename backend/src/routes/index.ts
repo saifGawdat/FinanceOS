@@ -9,6 +9,7 @@ import monthlySummaryRoutes from "./monthly-summary.routes";
 import dashboardRoutes from "./dashboard.routes";
 import aiRoutes from "./ai.routes";
 import goalsRoutes from "./goals.routes";
+import recurringRoutes from "./recurring.routes";
 
 const router = Router();
 
@@ -22,4 +23,5 @@ router.use("/monthly-summary", monthlySummaryRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/ai", aiRoutes);
 router.use("/goals", goalsRoutes);
+router.use("/recurring", recurringRoutes);
 export default router;

@@ -13,6 +13,7 @@ import {
   IoStatsChartOutline,
   IoSettingsOutline,
   IoTrophyOutline,
+  IoRepeatOutline,
 } from "react-icons/io5";
 
 const DashboardLayout = ({ children }) => {
@@ -20,7 +21,6 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
 
   const handleLogout = () => {
     logout();
@@ -32,6 +32,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/income", icon: IoWalletOutline, label: "Income" },
     { path: "/expense", icon: IoCartOutline, label: "Expenses" },
     { path: "/goals", icon: IoTrophyOutline, label: "Goals" },
+    { path: "/recurring", icon: IoRepeatOutline, label: "Recurring" },
     { path: "/employees", icon: IoPeopleOutline, label: "Employees" },
     { path: "/monthly-salaries", icon: IoCashOutline, label: "Salaries" },
     { path: "/profit-summary", icon: IoStatsChartOutline, label: "Profit" },
@@ -47,7 +48,11 @@ const DashboardLayout = ({ children }) => {
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-1.5 hover:bg-white/5 rounded-lg transition-all text-gray-400"
         >
-          {sidebarOpen ? <IoCloseOutline size={24} /> : <IoMenuOutline size={24} />}
+          {sidebarOpen ? (
+            <IoCloseOutline size={24} />
+          ) : (
+            <IoMenuOutline size={24} />
+          )}
         </button>
         <h1 className="text-sm font-bold text-white tracking-tight absolute left-1/2 -translate-x-1/2">
           FinanceOS
@@ -69,15 +74,21 @@ const DashboardLayout = ({ children }) => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <IoStatsChartOutline className="text-white" size={16} />
               </div>
-              <h1 className="text-lg font-bold text-white tracking-tight">FinanceOS</h1>
+              <h1 className="text-lg font-bold text-white tracking-tight">
+                FinanceOS
+              </h1>
             </div>
-            <p className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold ml-11">Management</p>
+            <p className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold ml-11">
+              Management
+            </p>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-8 overflow-y-auto">
             <div>
-              <p className="px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">Main Menu</p>
+              <p className="px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">
+                Main Menu
+              </p>
               <ul className="space-y-1">
                 {navItems.map((item) => (
                   <li key={item.path}>
@@ -90,7 +101,14 @@ const DashboardLayout = ({ children }) => {
                           : "text-gray-500 hover:text-gray-200 hover:bg-white/3"
                       }`}
                     >
-                      <item.icon size={18} className={location.pathname === item.path ? "" : "group-hover:text-blue-400 transition-colors"} />
+                      <item.icon
+                        size={18}
+                        className={
+                          location.pathname === item.path
+                            ? ""
+                            : "group-hover:text-blue-400 transition-colors"
+                        }
+                      />
                       <span>{item.label}</span>
                     </Link>
                   </li>
@@ -106,8 +124,12 @@ const DashboardLayout = ({ children }) => {
                 {user?.name?.charAt(0) || "A"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-gray-200 truncate">{user?.name}</p>
-                <p className="text-[10px] text-gray-600 font-medium truncate uppercase tracking-tighter">Administrator</p>
+                <p className="text-xs font-bold text-gray-200 truncate">
+                  {user?.name}
+                </p>
+                <p className="text-[10px] text-gray-600 font-medium truncate uppercase tracking-tighter">
+                  Administrator
+                </p>
               </div>
             </div>
             <button

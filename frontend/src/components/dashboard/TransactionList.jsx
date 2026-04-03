@@ -1,5 +1,5 @@
 import React from "react";
-import { IoTrash } from "react-icons/io5";
+import { IoTrash, IoRepeatOutline } from "react-icons/io5";
 import { formatCurrency, formatDate } from "../../utils/formatters";
 
 const TransactionList = ({ transactions, onDelete, type }) => {
@@ -19,9 +19,17 @@ const TransactionList = ({ transactions, onDelete, type }) => {
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/2 border-b border-white/5 hover:bg-white/4 transition-all duration-150 group gap-4"
         >
           <div className="flex-1 w-full">
-            <h4 className="font-semibold text-gray-200 wrap-break-word">
-              {transaction.title}
-            </h4>
+            <div className="flex items-center gap-2">
+              <h4 className="font-semibold text-gray-200 wrap-break-word">
+                {transaction.title}
+              </h4>
+              {transaction.isRecurring && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-wider">
+                  <IoRepeatOutline size={10} />
+                  Auto
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3 mt-1">
               <span className="text-sm text-gray-400">
                 {transaction.category}

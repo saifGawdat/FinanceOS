@@ -8,6 +8,8 @@ export interface IIncome extends Document {
   date: Date;
   description?: string;
   customer?: mongoose.Types.ObjectId;
+  isRecurring?: boolean;
+  recurringId?: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
@@ -44,6 +46,14 @@ const incomeSchema = new Schema<IIncome>({
   customer: {
     type: Schema.Types.ObjectId,
     ref: "Customer",
+  },
+  isRecurring: {
+    type: Boolean,
+    default: false,
+  },
+  recurringId: {
+    type: Schema.Types.ObjectId,
+    ref: "RecurringTransaction",
   },
   createdAt: {
     type: Date,
