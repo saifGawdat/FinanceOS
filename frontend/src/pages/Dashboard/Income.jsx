@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -16,6 +17,7 @@ import { exportIncomeToExcel } from "../../utils/exportToExcel";
 import { IoAddCircleOutline, IoDownloadOutline } from "react-icons/io5";
 
 const Income = () => {
+  const { t } = useTranslation();
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -119,14 +121,14 @@ const Income = () => {
   return (
     <DashboardLayout>
       <div>
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left rtl:text-right">
           <div className="w-full">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-              Income Management
+              {t("income.title")}
             </h1>
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2 justify-center md:justify-start">
               <p className="text-gray-400">
-                Total Income:{" "}
+                {t("income.total")}:{" "}
                 <span className="text-blue-500 font-bold text-xl">
                   {formatCurrency(totalIncome)}
                 </span>
@@ -149,14 +151,14 @@ const Income = () => {
               className="flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <IoDownloadOutline size={20} />
-              Export to Excel
+              {t("actions.export")}
             </Button>
             <Button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <IoAddCircleOutline size={20} />
-              Add Income
+              {t("actions.add")}
             </Button>
           </div>
         </div>
@@ -172,13 +174,13 @@ const Income = () => {
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
               {/* معلومات الصفحة - Page Info */}
               <div className="text-sm text-gray-400">
-                <span className="font-medium">Showing</span>{" "}
+                <span className="font-medium">{t("pagination.showing")}</span>{" "}
                 <span className="font-bold text-blue-400">
                   {incomes.length}
                 </span>{" "}
-                <span className="font-medium">of</span>{" "}
+                <span className="font-medium">{t("pagination.of")}</span>{" "}
                 <span className="font-bold text-blue-400">{totalItems}</span>{" "}
-                <span className="font-medium">transactions</span>
+                <span className="font-medium">{t("pagination.transactions")}</span>
               </div>
 
               {/* أزرار التنقل - Navigation Buttons */}
@@ -190,16 +192,16 @@ const Income = () => {
                   disabled={currentPage === 1 || paginationLoading}
                   className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
-                  <span>←</span>
-                  <span className="hidden sm:inline">Previous</span>
+                  <span className="rtl:rotate-180">←</span>
+                  <span className="hidden sm:inline">{t("pagination.previous")}</span>
                 </button>
 
-                <div className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-xl font-bold min-w-[100px] text-center">
+                <div className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-xl font-bold min-w-[100px] text-center tabular-nums rtl:text-right">
                   {paginationLoading ? (
-                    <span className="text-xs">Loading...</span>
+                    <span className="text-xs">{t("actions.loading")}</span>
                   ) : (
                     <span>
-                      Page {currentPage} of {totalPages}
+                      {t("pagination.page_x_of_y", { current: currentPage, total: totalPages })}
                     </span>
                   )}
                 </div>
@@ -211,8 +213,8 @@ const Income = () => {
                   disabled={currentPage >= totalPages || paginationLoading}
                   className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                 >
-                  <span className="hidden sm:inline">Next</span>
-                  <span>→</span>
+                  <span className="hidden sm:inline">{t("pagination.next")}</span>
+                  <span className="rtl:rotate-180">→</span>
                 </button>
               </div>
             </div>
@@ -222,19 +224,19 @@ const Income = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title="Add New Income"
+          title={t("income.add_new")}
         >
           <form onSubmit={handleSubmit}>
             <Input
-              label="Title"
+              label={t("forms.title")}
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g., Salary"
+              placeholder={t("forms.title_placeholder")}
               required
             />
             <Input
-              label="Amount (£)"
+              label={t("forms.amount")}
               type="number"
               name="amount"
               value={formData.amount}
@@ -243,15 +245,15 @@ const Income = () => {
               required
             />
             <Input
-              label="Category"
+              label={t("forms.category")}
               name="category"
               value={formData.category}
               onChange={handleChange}
-              placeholder="e.g., Salary, Freelance"
+              placeholder={t("forms.category_placeholder")}
               required
             />
             <Input
-              label="Date"
+              label={t("forms.date")}
               type="date"
               name="date"
               value={formData.date}
@@ -260,19 +262,19 @@ const Income = () => {
             />
             <div className="mb-6">
               <label className="block text-gray-300 text-sm font-medium mb-2">
-                Description (Optional)
+                {t("forms.description")} ({t("forms.optional")})
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Add notes..."
+                placeholder={t("forms.notes_placeholder")}
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
               />
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Adding..." : "Add Income"}
+              {isSubmitting ? t("actions.adding") : t("income.add_new")}
             </Button>
           </form>
         </Modal>
@@ -283,13 +285,11 @@ const Income = () => {
           onClose={() => {
             if (!isDeleting) setDeleteIncomeId(null);
           }}
-          title="Delete Income"
+          title={t("income.delete_title")}
         >
           <div className="space-y-4">
             <p className="text-sm text-gray-300">
-              Are you sure you want to permanently{" "}
-              <span className="font-semibold text-red-400">delete</span> this
-              income record? This action cannot be undone.
+              {t("modals.delete_confirm")}
             </p>
             <div className="flex justify-end gap-3 mt-2">
               <Button
@@ -299,15 +299,15 @@ const Income = () => {
                 className="px-4"
                 disabled={isDeleting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={confirmDeleteIncome}
-                className="px-4"
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20"
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? t("actions.deleting") : t("actions.delete")}
               </Button>
             </div>
           </div>

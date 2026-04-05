@@ -1,0 +1,418 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "income": "Income",
+    "expenses": "Expenses",
+    "goals": "Goals",
+    "recurring": "Recurring",
+    "employees": "Employees",
+    "salaries": "Salaries",
+    "profit": "Profit",
+    "customers": "Customers",
+    "settings": "Settings",
+    "logout": "LOGOUT SYSTEM",
+    "main_menu": "Main Menu",
+    "management": "Management",
+    "administrator": "Administrator"
+  },
+  "common": {
+    "title": "Title",
+    "amount": "Amount",
+    "category": "Category",
+    "date": "Date",
+    "other": "Other",
+    "export": "Export to Excel",
+    "title_placeholder": "e.g., Salary",
+    "error_process": "Sorry, an error occurred during processing.",
+    "success_process": "Success!",
+    "filter": "Filter by",
+    "loading": "Loading..."
+  },
+  "settings": {
+    "title": "System Configuration",
+    "main_title": "Settings",
+    "interface": "Interface",
+    "subtitle": "Core preferences and security management",
+    "regional": {
+      "title": "Regional Settings",
+      "subtitle": "Language and display preferences",
+      "language": "System Language",
+      "en": "English - Global",
+      "ar": "Arabic (العربية)",
+      "select": "Changes will be applied instantly across the entire system."
+    },
+    "profile": {
+      "title": "Communication",
+      "subtitle": "WhatsApp integration profile",
+      "label": "System Phone Number",
+      "button": "COMMIT",
+      "syncing": "SYNCING...",
+      "success": "Registry Updated Successfully",
+      "warning": "CRITICAL: Ensure international prefix (e.g., +20) is included for automated WhatsApp dispatch logic."
+    },
+    "application": {
+      "title": "Application",
+      "subtitle": "Standardize accessibility",
+      "pwa": "System PWA",
+      "pwa_sub": "Enable standalone infrastructure",
+      "deploy": "Deploy to Local"
+    },
+    "security": {
+      "title": "Security Protocol",
+      "subtitle": "Terminal operations",
+      "erase": "Erase Credentials",
+      "erase_sub": "Executing this utility will purge all records from the distributed ledger. This action is irreversible and terminates the authentication lease.",
+      "button": "Initiate Termination"
+    },
+    "modals": {
+      "pwa_title": "Infrastructure Deployment",
+      "pwa_confirm": "Confirm standalone application provisioning? This enables cached access and dedicated shell UI.",
+      "pwa_error": "Please use your browser's menu (Add to home screen) to install.",
+      "abort": "Abort",
+      "proceed": "Proceed",
+      "delete_title": "Access Termination",
+      "delete_warning_title": "CRITICAL WARNING",
+      "delete_warning": "Dissolution is irreversible. All transactional records, ledger entries, and profile metadata will be permanently neutralized.",
+      "delete_label": "Confirm Authorization Key",
+      "delete_placeholder": "TYPE 'DELETE' TO CONFIRM",
+      "delete_success_title": "Memory Purged",
+      "delete_success_sub": "Account dissolution finalized. Neutralizing session...",
+      "delete_cancel": "Cancel",
+      "delete_purge": "Purge"
+    }
+  },
+  "home": {
+    "title": "Dashboard Overview",
+    "subtitle": "Projected summary for",
+    "loading": "Loading FinanceOS",
+    "stats": {
+      "balance": "Total Balance",
+      "income": "Total Income",
+      "expenses": "Total Expenses"
+    },
+    "charts": {
+      "revenue": "Revenue vs Expenses",
+      "revenue_sub": "Monthly flow comparison",
+      "distribution": "Distribution",
+      "distribution_sub": "Spending by category",
+      "savings": "Savings Rate",
+      "savings_sub": "Percentage of income retained",
+      "growth": "Financial Growth",
+      "growth_sub": "Income and expense timeline",
+      "recent": "Recent Transactions",
+      "recent_sub": "Latest movement across all accounts",
+      "sources": "Income Sources",
+      "sources_sub": "Revenue breakdown by category",
+      "goals": "Goals Progress",
+      "goals_sub": "Lowest completion first"
+    }
+  },
+  "system": {
+    "security_check": "FinanceOS Security Check",
+    "integrity_check": "FinanceOS Integrity Check"
+  },
+  "actions": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "export": "Export to Excel",
+    "refresh": "Refresh",
+    "submitting": "Submitting...",
+    "deleting": "Deleting...",
+    "adding": "Adding...",
+    "neutralizing": "Neutralizing session..."
+  },
+  "forms": {
+    "title": "Title",
+    "amount": "Amount (£)",
+    "category": "Category",
+    "date": "Date",
+    "description": "Description",
+    "optional": "Optional",
+    "notes_placeholder": "Add notes...",
+    "title_placeholder": "e.g., Salary",
+    "category_placeholder": "e.g., Salary, Freelance"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "transactions": "transactions",
+    "previous": "Previous",
+    "next": "Next",
+    "page_x_of_y": "Page {{current}} of {{total}}"
+  },
+  "modals": {
+    "delete_title": "Delete Confirmation",
+    "delete_confirm": "Are you sure you want to permanently delete this record? This action cannot be undone.",
+    "access_termination": "Access Termination",
+    "critical_warning": "CRITICAL WARNING",
+    "dissolution_warning": "Dissolution is irreversible. All transactional records, ledger entries, and profile metadata will be permanently neutralized."
+  },
+  "months": [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ],
+  "customers": {
+    "title": "Subscriber",
+    "subtitle": "Registry",
+    "description": "Monthly recurring revenue and collection lifecycle",
+    "export": "Export",
+    "provision": "Provision",
+    "syncing": "Synchronizing Customer Core...",
+    "index": "Index",
+    "entities": "Entities",
+    "querying": "QUERYING...",
+    "sector": "Sector",
+    "of": "OF",
+    "status": {
+      "cleared": "Cleared",
+      "pending": "Pending"
+    },
+    "labels": {
+      "id": "Identification",
+      "yield": "Yield",
+      "activity": "Last Activity",
+      "deadline": "SLA Deadline",
+      "ltv": "LTV Analysis",
+      "processing": "Processing...",
+      "no_record": "No Record",
+      "unrestricted": "Unrestricted",
+      "registry_void": "Registry is currently void of active subscribers."
+    },
+    "actions": {
+      "clear_due": "Clear Due",
+      "revert": "Revert",
+      "whatsapp": "WhatsApp Dispatch",
+      "modify": "Modify Entry",
+      "terminate": "Terminate Record"
+    },
+    "form": {
+      "add_title": "Provision New Entity",
+      "edit_title": "Calibrate Subscriber",
+      "identity": "Legal Identity",
+      "identity_placeholder": "Full Entity Name",
+      "trade": "Trade Marker",
+      "trade_placeholder": "Commercial Brand",
+      "comm_line": "Communication Line",
+      "commitment": "Monthly Commitment",
+      "abort": "Abort",
+      "processing": "PROCESSING...",
+      "sync_changes": "SYNC CHANGES"
+    },
+    "confirm": {
+      "title": "Override Confirmation",
+      "pay_text": "Confirm capital injection for the period {{date}} from this entity?",
+      "unpay_text": "Confirm ledger reversal? This will treat the current period as UNSETTLED.",
+      "delete_text": "Initiate record termination? This action is IRREVERSIBLE and will purge historical subscription data."
+    }
+  },
+  "income": {
+    "title": "Income Management",
+    "total": "Total Income",
+    "add_new": "Add New Income",
+    "delete_title": "Delete Income"
+  },
+  "list": {
+    "no_records": "No {{type}} found",
+    "auto": "Auto"
+  },
+  "expense": {
+    "title": "Expense Management",
+    "total": "Total Expenses",
+    "total_transactions": "Total Transactions",
+    "total_category": "Total Category Expenses",
+    "add_new": "Add New Expense",
+    "delete_title": "Delete Expense",
+    "copy_past": "Copy from Past Month",
+    "add_category_spend": "Add Category Spend",
+    "tabs": {
+      "transactions": "Transactions",
+      "categories": "Categories",
+      "income": "Incomes"
+    },
+    "category_card": {
+      "virtual": "Virtual",
+      "monthly_budget": "Monthly Budget",
+      "no_records": "No Records Found"
+    },
+    "breakdown": {
+      "title": "Category Breakdown",
+      "system_title": "System Breakdown",
+      "no_spend": "No spend recorded"
+    },
+    "copy_modal": {
+      "title": "Copy Categories from Previous Month",
+      "confirm_text": "This will copy all category budgets from {{prev}} into {{current}}. Existing categories in the current month are not allowed.",
+      "success": "Categories copied successfully!",
+      "error_exists": "Failed to copy categories. They might already exist or the previous month is empty."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue to your account",
+      "email": "Email",
+      "email_placeholder": "Enter your email",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "submit": "Sign In",
+      "google": "Continue with Google",
+      "or": "Or continue with",
+      "no_account": "Don't have an account?",
+      "signup_link": "Sign Up",
+      "failed": "Login failed",
+      "google_failed": "Google login failed"
+    },
+    "signup": {
+      "title": "Create New Account",
+      "subtitle": "Start managing your finances intelligently today",
+      "name": "Full Name",
+      "name_placeholder": "Enter your full name",
+      "email": "Email",
+      "email_placeholder": "example@domain.com",
+      "password": "Password",
+      "password_placeholder": "Create a strong password",
+      "submit": "Create Account",
+      "have_account": "Already have an account?",
+      "login_link": "Sign In",
+      "failed": "Account creation failed"
+    }
+  },
+  "employees": {
+    "title": "Personnel Management",
+    "subtitle": "Talent and payroll administration for",
+    "add_new": "Provision Employee",
+    "export": "Export Registry",
+    "adjustments": "Monthly Adjustments",
+    "syncing": "Synchronizing personnel core...",
+    "no_results": "No results found in registry.",
+    "stats": {
+      "total": "Total Personnel",
+      "net_salaries": "Total Net Payroll",
+      "avg_salary": "Avg Net Salary",
+      "base_salary": "Base Salary"
+    },
+    "table": {
+      "name_contact": "Name & Contact",
+      "role": "Role & Tenure",
+      "base": "Base Salary",
+      "bonuses": "Bonuses",
+      "deductions": "Deductions",
+      "net": "Net Payout",
+      "control": "Control",
+      "no_phone": "No Phone"
+    },
+    "form": {
+      "add_title": "Provision New Employee",
+      "edit_title": "Calibrate Personnel",
+      "name": "Name",
+      "role": "Job Title",
+      "salary": "Monthly Salary",
+      "phone": "Phone Number",
+      "joined": "Join Date",
+      "save": "COMMIT PERSONNEL",
+      "updating": "UPDATING...",
+      "creating": "CREATING..."
+    },
+    "adjustments_modal": {
+      "title": "Monthly Adjustments",
+      "subtitle": "Manage payroll bonuses and deductions",
+      "select_period": "Select Period",
+      "global_totals": "Global Totals",
+      "syncing": "SYNCING...",
+      "add_adjustment": "Add Adjustment",
+      "type": "Type",
+      "bonus": "Bonus",
+      "deduction": "Deduction",
+      "amount": "Amount",
+      "description": "Description / Reason",
+      "submit": "Insert Adjustment",
+      "success": "Adjustment added successfully"
+    }
+  },
+  "payroll": {
+    "title": "Payroll Intelligence",
+    "subtitle": "Unified distribution metrics for",
+    "gross_disbursement": "Gross Monthly Disbursement",
+    "active_personnel": "Active Personnel",
+    "syncing": "Synchronizing Ledger...",
+    "no_records": "No active records for this period.",
+    "table": {
+      "id_name": "Personnel ID & Name",
+      "designation": "Job Role",
+      "payout": "Total Payout",
+      "allocation": "Allocation Rate"
+    },
+    "stats": {
+      "avg_comp": "Avg Compensation",
+      "peak_disbursement": "Peak Disbursement",
+      "baseline_comp": "Baseline Comp"
+    }
+  },
+  "performance": {
+    "title": "Financial Performance",
+    "subtitle": "Margin analysis and general ledger summary",
+    "period_audit": "Period Audit",
+    "historical": "Historical Data",
+    "syncing": "Compiling Ledger Intelligence...",
+    "no_data": "No ledger data found for the selected period.",
+    "surplus": "Operational Surplus",
+    "deficit": "Operational Deficit",
+    "net_result": "Net Result for",
+    "stats": {
+      "receipts": "Gross Receipts",
+      "burn": "Operational Burn",
+      "payroll": "Payroll Liability"
+    },
+    "distribution": {
+      "revenue": "Revenue Distribution",
+      "collections": "Customer Collections",
+      "expense": "Expense Distribution",
+      "logistics": "Logistics",
+      "maintenance": "Maintenance",
+      "infrastructure": "Infrastructure",
+      "general": "General Expenses"
+    }
+  },
+  "goals": {
+    "title": "Financial Objectives",
+    "progress": "Aggregate Progress",
+    "add_new": "New Objective",
+    "no_goals": "No objectives found. Provision a new one.",
+    "loading": "Loading Objectives...",
+    "due": "Due on",
+    "form": {
+      "add_title": "Provision New Objective",
+      "edit_title": "Calibrate Objective",
+      "title": "Objective Title",
+      "target": "Target Amount",
+      "current": "Current Ledger",
+      "date": "Target Date (Optional)",
+      "placeholder": "e.g., Emergency Fund"
+    },
+    "delete": {
+      "title": "Terminate Objective",
+      "confirm": "Confirm permanent termination of this objective?"
+    }
+  },
+  "recurring": {
+    "title": "Recurring Ledger",
+    "subtitle": "Automated monthly ledger entries",
+    "add_new": "Add Recurring Entry",
+    "net": "Net Recurring",
+    "income_tab": "Recurring Income",
+    "expense_tab": "Recurring Expense",
+    "no_records": "No recurring records found for {{type}} yet.",
+    "active": "Active",
+    "paused": "Paused",
+    "day_of_month": "Day {{day}} of month",
+    "form": {
+      "type": "Type",
+      "day": "Day of Month",
+      "day_hint": "Capped at Day 28 for universal compatibility"
+    }
+  }
+}

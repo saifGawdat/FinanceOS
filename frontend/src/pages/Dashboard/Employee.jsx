@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import { IoBarChartOutline, IoCloseOutline } from "react-icons/io5";
 
 import Button from "../../components/ui/Button";
@@ -19,6 +20,7 @@ import {
 import { formatCurrency } from "../../utils/formatters";
 
 const Employee = () => {
+  const { t, i18n } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -157,20 +159,7 @@ const Employee = () => {
   });
 
   const [adjustmentsError, setAdjustmentsError] = useState("");
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const months = t("months", { returnObjects: true });
 
   const fetchTransactions = useCallback(async () => {
     try {
@@ -242,7 +231,6 @@ const Employee = () => {
       setIsDeleting(false);
     }
   };
-
   const getEmployeeStats = (employee) => {
     const employeeTransactions = transactions.filter(
       (t) => t.employee && t.employee._id === employee._id,
@@ -256,10 +244,9 @@ const Employee = () => {
     const netSalary = Number(employee.salary || 0) + bonuses - deductions;
     return { bonuses, deductions, netSalary };
   };
-
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    if (!dateString) return t("employees.table.no_phone");
+    return new Date(dateString).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -287,12 +274,12 @@ const Employee = () => {
     const dataToExport = filteredEmployees.map((emp) => {
       const stats = getEmployeeStats(emp);
       return {
-        "Employee Name": emp.name,
-        "Job Title": emp.jobTitle,
-        "Base Salary": emp.salary,
-        Bonuses: stats.bonuses,
-        Deductions: stats.deductions,
-        "Net Salary": stats.netSalary,
+        [t("employees.form.name")]: emp.name,
+        [t("employees.form.role")]: emp.jobTitle,
+        [t("employees.stats.base_salary")]: emp.salary,
+        [t("employees.table.bonuses")]: stats.bonuses,
+        [t("employees.table.deductions")]: stats.deductions,
+        [t("employees.table.net")]: stats.netSalary,
       };
     });
 
@@ -316,13 +303,13 @@ const Employee = () => {
   return (
     <DashboardLayout>
       <div className="p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left rtl:text-right">
           <div className="w-full">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-              Employee Management
+              {t("employees.title")}
             </h1>
             <p className="text-gray-400 mt-1">
-              Manage your employees and their salaries for{" "}
+              {t("employees.subtitle")}{" "}
               <span className="font-semibold text-blue-400">
                 {months[selectedMonth - 1]} {selectedYear}
               </span>
@@ -335,7 +322,7 @@ const Employee = () => {
               className="flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               <IoDownloadOutline size={20} />
-              Export to Excel
+              {t("employees.export")}
             </Button>
             <Button
               onClick={() => setShowAdjustmentsModal(true)}
@@ -345,10 +332,10 @@ const Employee = () => {
               <span>
                 <IoBarChartOutline size={20} />
               </span>{" "}
-              Monthly Adjustments
+              {t("employees.adjustments")}
             </Button>
             <Button onClick={handleAddNew} className="w-full sm:w-auto">
-              + Add Employee
+              + {t("employees.add_new")}
             </Button>
           </div>
         </div>
@@ -362,25 +349,25 @@ const Employee = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-[#0e0e12] p-6 rounded-2xl border border-white/5 flex items-center justify-center flex-col shadow-2xl shadow-black/60 group hover:border-white/10 transition-all duration-300">
-            <p className="text-blue-400 text-xs font-black uppercase tracking-widest mb-1">Total Employees</p>
+            <p className="text-blue-400 text-xs font-black uppercase tracking-widest mb-1">{t("employees.stats.total")}</p>
             <p className="text-4xl font-black text-white">
               {filteredEmployees.length}
             </p>
           </div>
           <div className="bg-[#0e0e12] p-6 rounded-2xl border border-white/5 flex items-center justify-center flex-col shadow-2xl shadow-black/60 border-l-4 border-l-blue-600 group hover:border-white/10 transition-all duration-300">
             <p className="text-blue-400 text-xs font-black uppercase tracking-widest mb-1">
-              Total Net Salaries
+              {t("employees.stats.net_salaries")}
             </p>
             <p className="text-4xl font-black text-white">
               {formatCurrency(totalNetSalaries)}
             </p>
             <p className="text-[10px] text-blue-500/60 mt-1 font-bold">
-              Base: {formatCurrency(totalBaseSalaries)}
+              {t("employees.stats.base_salary")}: {formatCurrency(totalBaseSalaries)}
             </p>
           </div>
           <div className="bg-[#0e0e12] p-6 rounded-2xl border border-white/5 flex items-center justify-center flex-col shadow-2xl shadow-black/60 border-l-4 border-l-gray-600 group hover:border-white/10 transition-all duration-300">
             <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">
-              Average Net Salary
+              {t("employees.stats.avg_salary")}
             </p>
             <p className="text-4xl font-black text-white">
               {formatCurrency(
@@ -408,37 +395,37 @@ const Employee = () => {
         <div className="bg-[#0e0e12] rounded-2xl overflow-hidden border border-white/5 shadow-2xl shadow-black/80">
           {loading ? (
             <div className="p-12 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">
-              Syncing Employees...
+              {t("employees.syncing")}
             </div>
           ) : filteredEmployees.length === 0 ? (
             <div className="p-12 text-center text-gray-500 italic">
-              No results found in your roster.
+              {t("employees.no_results")}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-white/5">
                 <thead className="bg-white/2">
                   <tr>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                      Name & Contact
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.name_contact")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                      Role & Tenure
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.role")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                      Base Salary
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.base")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">
-                      Bonuses
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.bonuses")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
-                      Deductions
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.deductions")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">
-                      Net Payout
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">
+                      {t("employees.table.net")}
                     </th>
-                    <th className="px-5 py-5 text-left text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                      Control
+                    <th className="px-5 py-5 text-left rtl:text-right text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                      {t("employees.table.control")}
                     </th>
                   </tr>
                 </thead>
@@ -450,59 +437,59 @@ const Employee = () => {
                         key={employee._id}
                         className="hover:bg-white/3 transition-all duration-300"
                       >
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-bold text-white tracking-tight">
                             {employee.name}
                           </div>
                           <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                            {employee.phoneNumber || "No Phone"}
+                            {employee.phoneNumber || t("employees.table.no_phone")}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-bold text-gray-400">
                             {employee.jobTitle}
                           </div>
-                          <div className="text-[10px] text-gray-600 font-medium">
+                          <div className="text-[10px] text-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                             Ext {formatDate(employee.dateJoined)}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-bold text-gray-400">
                             {formatCurrency(employee.salary)}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-black text-blue-500">
                             {stats.bonuses > 0
                               ? `+${stats.bonuses.toLocaleString()}`
                               : "—"}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-black text-red-500">
                             {stats.deductions > 0
                               ? `-${stats.deductions.toLocaleString()}`
                               : "—"}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap">
+                        <td className="px-5 py-5 whitespace-nowrap text-left rtl:text-right">
                           <div className="text-sm font-black text-white bg-white/5 border border-white/5 px-3 py-1 rounded-lg w-fit shadow-inner">
                             {formatCurrency(stats.netSalary)}
                           </div>
                         </td>
-                        <td className="px-5 py-5 whitespace-nowrap text-sm">
+                        <td className="px-5 py-5 whitespace-nowrap text-sm text-left rtl:text-right">
                           <div className="flex gap-4">
                             <button
                               onClick={() => handleEdit(employee)}
                               className="text-blue-500 hover:text-blue-400 font-black text-[10px] uppercase tracking-widest transition-all"
                             >
-                              Edit
+                              {t("actions.edit")}
                             </button>
                             <button
                               onClick={() => handleDelete(employee._id)}
                               className="text-red-500 hover:text-red-400 font-black text-[10px] uppercase tracking-widest transition-all"
                             >
-                              Delete
+                              {t("actions.delete")}
                             </button>
                           </div>
                         </td>
@@ -520,14 +507,14 @@ const Employee = () => {
         {!loading && employees.filter((employee) => employee.isActive).length > 0 && (
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/2 p-5 rounded-2xl border border-white/5 shadow-2xl shadow-black/80">
             {/* معلومات الصفحة - Page Information */}
-            <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest text-center sm:text-left">
-              <span>Showing</span>{" "}
+            <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest text-center sm:text-left rtl:text-right">
+              <span>{t("pagination.showing")}</span>{" "}
               <span className="text-blue-500 mx-1">
                 {employees.filter((employee) => employee.isActive).length}
               </span>{" "}
-              <span>of</span>{" "}
+              <span>{t("pagination.of")}</span>{" "}
               <span className="text-blue-500 mx-1">{totalItems}</span>{" "}
-              <span>personnel</span>
+              <span>{t("employees.stats.total")}</span>
             </div>
 
             {/* أزرار التنقل - Navigation Buttons */}
@@ -582,12 +569,12 @@ const Employee = () => {
               dateJoined: new Date().toISOString().split("T")[0],
             });
           }}
-          title={editingEmployee ? "Edit Employee" : "Add New Employee"}
+          title={editingEmployee ? t("employees.form.edit_title") : t("employees.form.add_title")}
         >
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Name"
+                label={t("employees.form.name")}
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -595,7 +582,7 @@ const Employee = () => {
                 required
               />
               <Input
-                label="Job Title"
+                label={t("employees.form.role")}
                 value={formData.jobTitle}
                 onChange={(e) =>
                   setFormData({ ...formData, jobTitle: e.target.value })
@@ -603,7 +590,7 @@ const Employee = () => {
                 required
               />
               <Input
-                label="Monthly Salary (£)"
+                label={`${t("employees.form.salary")} (£)`}
                 type="number"
                 value={formData.salary}
                 onChange={(e) =>
@@ -614,7 +601,7 @@ const Employee = () => {
                 step="0.01"
               />
               <Input
-                label="Phone Number"
+                label={t("employees.form.phone")}
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) =>
@@ -627,7 +614,7 @@ const Employee = () => {
               />
               <div className="md:col-span-2">
                 <Input
-                  label="Date Joined"
+                  label={t("employees.form.joined")}
                   type="date"
                   value={formData.dateJoined}
                   onChange={(e) =>
@@ -643,10 +630,10 @@ const Employee = () => {
             <div className="flex gap-4 mt-6">
               <Button type="submit" className="flex-1" disabled={isSubmitting}>
                 {isSubmitting
-                  ? "Saving..."
+                  ? t("actions.submitting")
                   : editingEmployee
-                    ? "Update Employee"
-                    : "Create Employee"}
+                    ? t("employees.form.updating")
+                    : t("employees.form.creating")}
               </Button>
               <Button
                 type="button"
@@ -664,7 +651,7 @@ const Employee = () => {
                 }}
                 className="flex-1"
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
             </div>
           </form>
@@ -677,10 +664,10 @@ const Employee = () => {
               <div className="flex justify-between items-center mb-8">
                 <div>
                   <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                    Monthly Adjustments
+                    {t("employees.adjustments_modal.title")}
                   </h2>
                   <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">
-                    Manage bonuses and deductions for payroll
+                    {t("employees.adjustments_modal.subtitle")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
@@ -727,20 +714,20 @@ const Employee = () => {
                   <table className="min-w-full divide-y divide-white/6 border border-white/6 rounded-xl overflow-hidden">
                     <thead className="bg-white/5 sticky top-0">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-400 uppercase">
-                          Employee
+                        <th className="px-4 py-3 text-left rtl:text-right text-xs font-bold text-gray-400 uppercase">
+                          {t("employees.form.name")}
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-400 uppercase">
-                          Base Salary
+                        <th className="px-4 py-3 text-right rtl:text-left text-xs font-bold text-gray-400 uppercase">
+                          {t("employees.stats.base_salary")}
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-bold text-blue-400 uppercase">
-                          Bonuses
+                        <th className="px-4 py-3 text-right rtl:text-left text-xs font-bold text-blue-400 uppercase">
+                          {t("employees.table.bonuses")}
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-bold text-red-400 uppercase">
-                          Deductions
+                        <th className="px-4 py-3 text-right rtl:text-left text-xs font-bold text-red-400 uppercase">
+                          {t("employees.table.deductions")}
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-200 uppercase">
-                          Net Salary
+                        <th className="px-4 py-3 text-right rtl:text-left text-xs font-bold text-gray-200 uppercase">
+                          {t("employees.table.net")}
                         </th>
                       </tr>
                     </thead>
@@ -752,32 +739,32 @@ const Employee = () => {
                             key={emp._id}
                             className="hover:bg-white/5 transition-colors"
                           >
-                            <td className="px-4 py-3 text-sm font-medium text-gray-300">
+                            <td className="px-4 py-3 text-sm font-medium text-gray-300 text-left rtl:text-right">
                               {emp.name}
                             </td>
-                            <td className="px-4 py-3 text-sm text-right text-gray-400">
+                            <td className="px-4 py-3 text-sm text-right rtl:text-left text-gray-400">
                               {formatCurrency(emp.salary)}
                             </td>
-                            <td className="px-4 py-3 text-sm text-right text-blue-400">
+                            <td className="px-4 py-3 text-sm text-right rtl:text-left text-blue-400">
                               {stats.bonuses > 0
                                 ? `+${stats.bonuses.toLocaleString()}`
                                 : "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-right text-red-400">
+                            <td className="px-4 py-3 text-sm text-right rtl:text-left text-red-400">
                               {stats.deductions > 0
                                 ? `-${stats.deductions.toLocaleString()}`
                                 : "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-right font-bold text-gray-300">
-                              £{stats.netSalary.toLocaleString()}
+                            <td className="px-4 py-3 text-sm text-right rtl:text-left font-bold text-gray-300">
+                              {formatCurrency(stats.netSalary)}
                             </td>
                           </tr>
                         );
                       })}
                     </tbody>
-                    <tfoot className="bg-white/[0.03] font-black text-white backdrop-blur-md">
+                    <tfoot className="bg-white/3 font-black text-white backdrop-blur-md">
                       <tr>
-                        <td className="px-5 py-5 text-[10px] uppercase tracking-widest">Global Totals</td>
+                        <td className="px-5 py-5 text-[10px] uppercase tracking-widest text-left rtl:text-right">{t("employees.adjustments_modal.global_totals")}</td>
                         <td className="px-5 py-5 text-right font-bold text-gray-500">
                           {formatCurrency(filteredEmployees.reduce((sum, e) => sum + Number(e.salary || 0), 0))}
                         </td>
@@ -798,7 +785,7 @@ const Employee = () => {
                 <div className="lg:col-span-1 flex flex-col gap-6 overflow-hidden">
                   <div className="bg-[#0e0e12] border border-white/5 rounded-2xl p-6 shadow-2xl">
                     <h3 className="text-sm font-black text-white mb-6 uppercase tracking-widest border-b border-white/5 pb-4">
-                      New Adjustment
+                      {t("employees.adjustments_modal.add_adjustment")}
                     </h3>
                     {adjustmentsError && (
                       <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-400">
@@ -807,8 +794,8 @@ const Employee = () => {
                     )}
                     <form onSubmit={handleAddTransaction} className="space-y-5">
                       <div>
-                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">
-                          Personnel
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1 rtl:mr-1 rtl:ml-0">
+                          {t("employees.table.name_contact")}
                         </label>
                         <select
                           className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-gray-200 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 transition-all appearance-none shadow-inner"
@@ -821,8 +808,9 @@ const Employee = () => {
                           }
                           required
                         >
+                          <option value="" className="bg-[#09090c]">{t("employees.adjustments_modal.select_period")}</option>
                           {employees.filter((employee) => employee.isActive).length === 0 && (
-                            <option value="" className="bg-[#09090c]">No Active Employees</option>
+                            <option value="" className="bg-[#09090c]">{t("employees.no_results")}</option>
                           )}
                           {employees.filter((employee) => employee.isActive).map((emp) => (
                             <option
@@ -846,7 +834,7 @@ const Employee = () => {
                               : "text-gray-500 hover:text-gray-300"
                           }`}
                         >
-                          Bonus
+                          {t("employees.adjustments_modal.bonus")}
                         </button>
                         <button
                           type="button"
@@ -857,12 +845,12 @@ const Employee = () => {
                               : "text-gray-500 hover:text-gray-300"
                           }`}
                         >
-                          Deduction
+                          {t("employees.adjustments_modal.deduction")}
                         </button>
                       </div>
 
                       <Input
-                        label="Amount (£)"
+                        label={t("employees.adjustments_modal.amount")}
                         type="number"
                         value={adjustmentFormData.amount}
                         onChange={(e) =>
@@ -877,8 +865,8 @@ const Employee = () => {
                       />
 
                       <div>
-                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">
-                          Authorization Reason
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1 rtl:mr-1 rtl:ml-0">
+                          {t("employees.adjustments_modal.description")}
                         </label>
                         <textarea
                           className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-gray-200 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 transition-all min-h-[100px] shadow-inner"
@@ -889,7 +877,7 @@ const Employee = () => {
                               description: e.target.value,
                             })
                           }
-                          placeholder="Purpose of adjustment..."
+                          placeholder={t("forms.notes_placeholder")}
                           required
                         />
                       </div>
@@ -899,18 +887,18 @@ const Employee = () => {
                         className="w-full py-4 font-black uppercase tracking-widest"
                         disabled={isAddingTransaction}
                       >
-                        {isAddingTransaction ? "SYNCING..." : "COMMIT ADJUSTMENT"}
+                        {isAddingTransaction ? t("employees.adjustments_modal.syncing") : t("employees.adjustments_modal.submit")}
                       </Button>
                     </form>
                   </div>
 
                   <div className="flex-1 overflow-y-auto bg-black/20 border border-white/5 rounded-2xl shadow-inner scrollbar-hide">
                     <div className="p-4 bg-white/3 border-b border-white/5 font-black text-[10px] text-gray-500 uppercase tracking-widest sticky top-0 backdrop-blur-md">
-                      Recent Ledger Entries
+                      {t("home.charts.recent")}
                     </div>
                     {transactions.length === 0 ? (
                       <p className="p-12 text-center text-gray-600 text-xs italic">
-                        No active adjustments in this period.
+                        {t("employees.payroll.no_records")}
                       </p>
                     ) : (
                       <ul className="divide-y divide-white/5">
@@ -927,7 +915,7 @@ const Employee = () => {
                                 {t.type} {t.description && `• ${t.description}`}
                               </div>
                             </div>
-                            <div className="text-right">
+                            <div className="text-right rtl:text-left">
                               <div
                                 className={`text-sm font-black ${
                                   t.type === "BONUS"
@@ -942,7 +930,7 @@ const Employee = () => {
                                 onClick={() => confirmDeleteTransaction(t._id)}
                                 className="text-[10px] text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all font-black uppercase tracking-widest mt-1"
                               >
-                                Purge
+                                {t("actions.delete")}
                               </button>
                             </div>
                           </li>
@@ -962,12 +950,11 @@ const Employee = () => {
         onClose={() => {
           if (!isDeleting) setDeleteEmployeeId(null);
         }}
-        title="Terminate Employee Record"
+        title={t("modals.delete_title")}
       >
         <div className="space-y-6">
           <p className="text-sm text-gray-400 leading-relaxed">
-            Are you sure you want to <span className="font-black text-red-500 uppercase tracking-widest">purge</span> this
-            personnel record? All associated salary and adjustment data will be permanently deleted from the ledger.
+            {t("modals.delete_confirm")}
           </p>
           <div className="flex justify-end gap-3 pt-2">
             <Button
@@ -977,7 +964,7 @@ const Employee = () => {
               className="px-6 font-bold"
               disabled={isDeleting}
             >
-              Abeyance
+              {t("actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -985,7 +972,7 @@ const Employee = () => {
               className="px-6 font-black bg-red-600 hover:bg-red-700 shadow-lg shadow-red-900/20"
               disabled={isDeleting}
             >
-              {isDeleting ? "PURGING..." : "CONFIRM PURGE"}
+              {isDeleting ? t("actions.deleting") : t("actions.confirm")}
             </Button>
           </div>
         </div>
@@ -997,12 +984,11 @@ const Employee = () => {
         onClose={() => {
           if (!isDeleting) setDeleteTransactionId(null);
         }}
-        title="Void Ledger Entry"
+        title={t("modals.delete_title")}
       >
         <div className="space-y-6">
           <p className="text-sm text-gray-400 leading-relaxed">
-            Are you sure you want to <span className="font-black text-red-500 uppercase tracking-widest">void</span> this
-            salary adjustment? This will recalculate the net payout for this period immediately.
+            {t("modals.delete_confirm")}
           </p>
           <div className="flex justify-end gap-3 pt-2">
             <Button
@@ -1012,7 +998,7 @@ const Employee = () => {
               className="px-6 font-bold"
               disabled={isDeleting}
             >
-              Abeyance
+              {t("actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -1020,8 +1006,8 @@ const Employee = () => {
               className="px-6 font-black bg-red-600 hover:bg-red-700 shadow-lg shadow-red-900/20"
               disabled={isDeleting}
             >
-              {isDeleting ? "VOIDING..." : "CONFIRM VOID"}
-            </Button>
+              {isDeleting ? t("actions.deleting") : t("actions.confirm")}
+              </Button>
           </div>
         </div>
       </Modal>

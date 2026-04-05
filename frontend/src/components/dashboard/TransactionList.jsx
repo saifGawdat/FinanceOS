@@ -1,12 +1,14 @@
 import React from "react";
 import { IoTrash, IoRepeatOutline } from "react-icons/io5";
+import { useTranslation } from "react-i18next";
 import { formatCurrency, formatDate } from "../../utils/formatters";
 
 const TransactionList = ({ transactions, onDelete, type }) => {
+  const { t } = useTranslation();
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        <p>No {type} found</p>
+        <p>{t("list.no_records", { type: t(`expense.tabs.${type === "income" ? "income" : "expenses"}`) })}</p>
       </div>
     );
   }

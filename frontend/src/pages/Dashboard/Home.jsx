@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import SummaryCard from "../../components/dashboard/SummaryCard";
 import Card from "../../components/ui/Card";
 import BarChart from "../../components/charts/BarChart";
@@ -23,6 +24,7 @@ import {
 } from "react-icons/io5";
 
 const Home = () => {
+  const { t, i18n } = useTranslation();
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -72,7 +74,7 @@ const Home = () => {
             <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
           </div>
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-            Loading FinanceOS
+            {t("home.loading")}
           </p>
         </div>
       </DashboardLayout>
@@ -85,13 +87,13 @@ const Home = () => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Dashboard Overview
+              {t("home.title")}
             </h1>
           </div>
           <p className="text-gray-500 text-sm mt-1.5 font-medium">
-            Projected summary for{" "}
+            {t("home.subtitle")}{" "}
             <span className="text-blue-400">
-              {new Date(year, month - 1).toLocaleDateString("en-US", {
+              {new Date(year, month - 1).toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", {
                 month: "long",
                 year: "numeric",
               })}
@@ -113,7 +115,7 @@ const Home = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         <SummaryCard
-          title="Total Balance"
+          title={t("home.stats.balance")}
           amount={stats.balance}
           icon={IoWalletOutline}
           iconColor="text-white"
@@ -121,14 +123,14 @@ const Home = () => {
           highlight={true}
         />
         <SummaryCard
-          title="Total Income"
+          title={t("home.stats.income")}
           amount={stats.totalIncome}
           icon={IoTrendingUpOutline}
           iconColor="text-blue-400"
           bgGradient="from-blue-500 to-blue-600"
         />
         <SummaryCard
-          title="Total Expenses"
+          title={t("home.stats.expenses")}
           amount={stats.totalExpense}
           icon={IoTrendingDownOutline}
           iconColor="text-red-400"
@@ -139,18 +141,18 @@ const Home = () => {
       {/* Charts Section */}
       <div className="space-y-6 mb-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card title="Revenue vs Expenses" subtitle="Monthly flow comparison">
+          <Card title={t("home.charts.revenue")} subtitle={t("home.charts.revenue_sub")}>
             <BarChart data={chartData.barChartData} />
           </Card>
-          <Card title="Distribution" subtitle="Spending by category">
+          <Card title={t("home.charts.distribution")} subtitle={t("home.charts.distribution_sub")}>
             <PieChart data={chartData.pieChartData} />
           </Card>
-          <Card title="Savings Rate" subtitle="Percentage of income retained">
+          <Card title={t("home.charts.savings")} subtitle={t("home.charts.savings_sub")}>
             <SavingsRateChart rate={savingsRate} />
           </Card>
         </div>
 
-        <Card title="Financial Growth" subtitle="Income and expense timeline">
+        <Card title={t("home.charts.growth")} subtitle={t("home.charts.growth_sub")}>
           <LineChart data={chartData.lineChartData} />
         </Card>
       </div>
@@ -159,8 +161,8 @@ const Home = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
           <Card
-            title="Recent Transactions"
-            subtitle="Latest movement across all accounts"
+            title={t("home.charts.recent")}
+            subtitle={t("home.charts.recent_sub")}
             className="h-full"
           >
             <RecentTransactions transactions={recentTransactions} />
@@ -168,8 +170,8 @@ const Home = () => {
         </div>
         <div className="lg:col-span-1">
           <Card
-            title="Income Sources"
-            subtitle="Revenue breakdown by category"
+            title={t("home.charts.sources")}
+            subtitle={t("home.charts.sources_sub")}
             className="h-full"
           >
             <div className="h-full">
@@ -179,8 +181,8 @@ const Home = () => {
         </div>
         <div className="lg:col-span-1">
           <Card
-            title="Goals Progress"
-            subtitle="Lowest completion first"
+            title={t("home.charts.goals")}
+            subtitle={t("home.charts.goals_sub")}
             className="h-full"
           >
             <GoalsProgressChart goals={goals} limit={6} height={220} />

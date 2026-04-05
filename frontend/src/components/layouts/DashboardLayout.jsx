@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import {
   IoHomeOutline,
@@ -18,26 +19,29 @@ import {
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  
+  const isRtl = i18n.language === "ar";
+  
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
   const navItems = [
-    { path: "/dashboard", icon: IoHomeOutline, label: "Dashboard" },
-    { path: "/income", icon: IoWalletOutline, label: "Income" },
-    { path: "/expense", icon: IoCartOutline, label: "Expenses" },
-    { path: "/goals", icon: IoTrophyOutline, label: "Goals" },
-    { path: "/recurring", icon: IoRepeatOutline, label: "Recurring" },
-    { path: "/employees", icon: IoPeopleOutline, label: "Employees" },
-    { path: "/monthly-salaries", icon: IoCashOutline, label: "Salaries" },
-    { path: "/profit-summary", icon: IoStatsChartOutline, label: "Profit" },
-    { path: "/customers", icon: IoPeopleOutline, label: "Customers" },
-    { path: "/settings", icon: IoSettingsOutline, label: "Settings" },
+    { path: "/dashboard", icon: IoHomeOutline, label: t("sidebar.dashboard") },
+    { path: "/income", icon: IoWalletOutline, label: t("sidebar.income") },
+    { path: "/expense", icon: IoCartOutline, label: t("sidebar.expenses") },
+    { path: "/goals", icon: IoTrophyOutline, label: t("sidebar.goals") },
+    { path: "/recurring", icon: IoRepeatOutline, label: t("sidebar.recurring") },
+    { path: "/employees", icon: IoPeopleOutline, label: t("sidebar.employees") },
+    { path: "/monthly-salaries", icon: IoCashOutline, label: t("sidebar.salaries") },
+    { path: "/profit-summary", icon: IoStatsChartOutline, label: t("sidebar.profit") },
+    { path: "/customers", icon: IoPeopleOutline, label: t("sidebar.customers") },
+    { path: "/settings", icon: IoSettingsOutline, label: t("sidebar.settings") },
   ];
 
   return (
@@ -64,8 +68,8 @@ const DashboardLayout = ({ children }) => {
         {/* Sidebar */}
         <aside
           className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#09090c] border-r border-white/5 transform transition-transform duration-300 ease-in-out h-full flex flex-col
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          fixed lg:static inset-y-0 ${isRtl ? "right-0" : "left-0"} z-50 w-64 bg-[#09090c] border-r border-white/5 transform transition-transform duration-300 ease-in-out h-full flex flex-col
+          ${sidebarOpen ? "translate-x-0" : isRtl ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
         >
           {/* Logo Section */}
@@ -78,8 +82,8 @@ const DashboardLayout = ({ children }) => {
                 FinanceOS
               </h1>
             </div>
-            <p className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold ml-11">
-              Management
+            <p className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold ml-11 rtl:ml-0 rtl:mr-11">
+              {t("sidebar.management")}
             </p>
           </div>
 
@@ -87,7 +91,7 @@ const DashboardLayout = ({ children }) => {
           <nav className="flex-1 p-4 space-y-8 overflow-y-auto">
             <div>
               <p className="px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">
-                Main Menu
+                {t("sidebar.main_menu")}
               </p>
               <ul className="space-y-1">
                 {navItems.map((item) => (
@@ -128,7 +132,7 @@ const DashboardLayout = ({ children }) => {
                   {user?.name}
                 </p>
                 <p className="text-[10px] text-gray-600 font-medium truncate uppercase tracking-tighter">
-                  Administrator
+                  {t("sidebar.administrator")}
                 </p>
               </div>
             </div>
@@ -137,7 +141,7 @@ const DashboardLayout = ({ children }) => {
               className="flex items-center gap-3 px-3 py-2.5 w-full text-gray-500 hover:bg-red-500/10 hover:text-red-400 rounded-xl text-xs font-bold transition-all"
             >
               <IoLogOutOutline size={18} />
-              <span>LOGOUT SYSTEM</span>
+              <span>{t("sidebar.logout")}</span>
             </button>
           </div>
         </aside>

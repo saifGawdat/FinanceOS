@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -33,6 +34,7 @@ const getProgressPercent = (currentAmount, targetAmount) => {
 };
 
 const Goals = () => {
+  const { t } = useTranslation();
   const { data: goals = [], isLoading, error } = useGetGoals();
   const createGoalMutation = useCreateGoal();
   const updateGoalMutation = useUpdateGoal();
@@ -170,14 +172,14 @@ const Goals = () => {
   return (
     <DashboardLayout>
       <div>
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left rtl:md:text-right">
           <div className="w-full">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-              Goals
+              {t("goals.title")}
             </h1>
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2 justify-center md:justify-start">
               <p className="text-gray-400">
-                Total Progress:{" "}
+                {t("goals.progress")}:{" "}
                 <span className="text-blue-500 font-bold text-xl">
                   {formatCurrency(totalCurrent)}
                 </span>{" "}
@@ -193,21 +195,21 @@ const Goals = () => {
             <Button
               onClick={() => exportGoalsToExcel(Array.isArray(goals) ? goals : [])}
               variant="outline"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto font-bold"
               disabled={!Array.isArray(goals) || goals.length === 0}
             >
               <IoDownloadOutline size={20} />
-              Export to Excel
+              {t("common.export")}
             </Button>
             <Button
               onClick={() => {
                 setErrorMsg("");
                 setIsCreateOpen(true);
               }}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto font-bold"
             >
               <IoAddCircleOutline size={20} />
-              Add Goal
+              {t("goals.add_new")}
             </Button>
           </div>
         </div>
@@ -220,7 +222,7 @@ const Goals = () => {
 
         <Card>
           {isLoading && (
-            <p className="text-gray-500 text-sm">Loading goals...</p>
+            <p className="text-gray-500 text-sm italic">{t("goals.loading")}</p>
           )}
 
           {!isLoading && error && (
@@ -230,7 +232,7 @@ const Goals = () => {
           )}
 
           {!isLoading && Array.isArray(goals) && goals.length === 0 && (
-            <p className="text-gray-500 text-sm">No goals yet. Add one.</p>
+            <p className="text-gray-500 text-sm italic">{t("goals.no_goals")}</p>
           )}
 
           {!isLoading && Array.isArray(goals) && goals.length > 0 && (
@@ -257,7 +259,7 @@ const Goals = () => {
                           </h3>
                           {due && (
                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 bg-white/2 border border-white/5 px-3 py-1 rounded-full">
-                              Due {due}
+                              {t("goals.due")} {due}
                             </span>
                           )}
                         </div>
@@ -284,20 +286,20 @@ const Goals = () => {
                       <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                         <Button
                           variant="outline"
-                          className="w-full sm:w-auto"
+                          className="w-full sm:w-auto font-bold"
                           onClick={() => openEdit(goal)}
                           disabled={isUpdating || isDeleting}
                         >
-                          Edit
+                          {t("actions.edit")}
                         </Button>
                         <Button
                           variant="secondary"
-                          className="w-full sm:w-auto flex items-center justify-center gap-2 text-red-300 border border-red-500/20 hover:bg-red-500/10"
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 text-red-300 border border-red-500/20 hover:bg-red-500/10 font-bold"
                           onClick={() => setDeleteGoalId(goal._id)}
                           disabled={isDeleting}
                         >
                           <IoTrashOutline size={16} />
-                          Delete
+                          {t("actions.delete")}
                         </Button>
                       </div>
                     </div>
@@ -313,21 +315,21 @@ const Goals = () => {
           onClose={() => {
             if (!isCreating) setIsCreateOpen(false);
           }}
-          title="Add New Goal"
+          title={t("goals.form.add_title")}
         >
           <form onSubmit={submitCreate}>
             <Input
-              label="Title"
+              label={t("goals.form.title")}
               name="title"
               value={createForm.title}
               onChange={(e) =>
                 setCreateForm((p) => ({ ...p, title: e.target.value }))
               }
-              placeholder="e.g., Emergency Fund"
+              placeholder={t("goals.form.placeholder")}
               required
             />
             <Input
-              label="Target Amount (£)"
+              label={`${t("goals.form.target")} (£)`}
               type="number"
               name="targetAmount"
               value={createForm.targetAmount}
@@ -338,7 +340,7 @@ const Goals = () => {
               required
             />
             <Input
-              label="Current Amount (£)"
+              label={`${t("goals.form.current")} (£)`}
               type="number"
               name="currentAmount"
               value={createForm.currentAmount}
@@ -348,7 +350,7 @@ const Goals = () => {
               placeholder="0.00"
             />
             <Input
-              label="Target Date (Optional)"
+              label={t("goals.form.date")}
               type="date"
               name="targetDate"
               value={createForm.targetDate}
@@ -356,8 +358,8 @@ const Goals = () => {
                 setCreateForm((p) => ({ ...p, targetDate: e.target.value }))
               }
             />
-            <Button type="submit" className="w-full" disabled={isCreating}>
-              {isCreating ? "Adding..." : "Add Goal"}
+            <Button type="submit" className="w-full font-bold" disabled={isCreating}>
+              {isCreating ? t("actions.loading") : t("goals.add_new")}
             </Button>
           </form>
         </Modal>
@@ -367,11 +369,11 @@ const Goals = () => {
           onClose={() => {
             if (!isUpdating) setEditingGoal(null);
           }}
-          title="Edit Goal"
+          title={t("goals.form.edit_title")}
         >
           <form onSubmit={submitUpdate}>
             <Input
-              label="Title"
+              label={t("goals.form.title")}
               name="title"
               value={editForm.title}
               onChange={(e) =>
@@ -380,7 +382,7 @@ const Goals = () => {
               required
             />
             <Input
-              label="Target Amount (£)"
+              label={`${t("goals.form.target")} (£)`}
               type="number"
               name="targetAmount"
               value={editForm.targetAmount}
@@ -390,7 +392,7 @@ const Goals = () => {
               required
             />
             <Input
-              label="Current Amount (£)"
+              label={`${t("goals.form.current")} (£)`}
               type="number"
               name="currentAmount"
               value={editForm.currentAmount}
@@ -399,7 +401,7 @@ const Goals = () => {
               }
             />
             <Input
-              label="Target Date (Optional)"
+              label={t("goals.form.date")}
               type="date"
               name="targetDate"
               value={editForm.targetDate}
@@ -407,8 +409,8 @@ const Goals = () => {
                 setEditForm((p) => ({ ...p, targetDate: e.target.value }))
               }
             />
-            <Button type="submit" className="w-full" disabled={isUpdating}>
-              {isUpdating ? "Saving..." : "Save Changes"}
+            <Button type="submit" className="w-full font-bold" disabled={isUpdating}>
+              {isUpdating ? t("actions.loading") : t("actions.save")}
             </Button>
           </form>
         </Modal>
@@ -418,31 +420,29 @@ const Goals = () => {
           onClose={() => {
             if (!isDeleting) setDeleteGoalId(null);
           }}
-          title="Delete Goal"
+          title={t("goals.delete.title")}
         >
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              Are you sure you want to permanently{" "}
-              <span className="font-semibold text-red-400">delete</span> this
-              goal? This action cannot be undone.
+            <p className="text-sm text-gray-300 rtl:text-right font-medium leading-relaxed">
+              {t("goals.delete.confirm")}
             </p>
             <div className="flex justify-end gap-3 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDeleteGoalId(null)}
-                className="px-4"
+                className="px-4 font-bold"
                 disabled={isDeleting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={confirmDelete}
-                className="px-4"
+                className="px-4 font-bold bg-red-600 hover:bg-red-700"
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? t("actions.deleting") : t("actions.delete")}
               </Button>
             </div>
           </div>

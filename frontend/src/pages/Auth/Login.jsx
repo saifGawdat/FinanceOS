@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -36,43 +37,45 @@ const Login = () => {
     }
   };
 
+  const { t } = useTranslation();
+
   return (
     <AuthLayout>
-      <div className="">
+      <div className="rtl:text-right">
         <h2 className="text-3xl font-bold text-gray-100 mb-2 text-center">
-          Welcome Back
+          {t("auth.login.title")}
         </h2>
         <p className="text-gray-400 mb-6 text-center">
-          Sign in to continue to your account
+          {t("auth.login.subtitle")}
         </p>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-4 text-center text-xs font-bold uppercase tracking-widest">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <Input
-            label="Email"
+            label={t("auth.login.email")}
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="Enter your email"
+            placeholder={t("auth.login.email_placeholder")}
             required
           />
           <Input
-            label="Password"
+            label={t("auth.login.password")}
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="Enter your password"
+            placeholder={t("auth.login.password_placeholder")}
             required
           />
           <Button type="submit" className="w-full">
-            Sign In
+            {t("auth.login.submit")}
           </Button>
         </form>
 
@@ -82,7 +85,7 @@ const Login = () => {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-2 bg-gray-900 text-gray-400">
-              Or continue with
+              {t("auth.login.or")}
             </span>
           </div>
         </div>
@@ -90,7 +93,7 @@ const Login = () => {
         <div className="flex justify-center mt-2">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => setError("Google Login Failed")}
+            onError={() => setError(t("auth.login.google_failed"))}
             theme="filled_blue"
             shape="pill"
             size="large"
@@ -100,12 +103,12 @@ const Login = () => {
         </div>
 
         <p className="text-center text-gray-400 mt-6">
-          Don't have an account?{" "}
+          {t("auth.login.no_account")}{" "}
           <Link
             to="/signUp"
             className="text-blue-400 font-semibold hover:text-blue-300"
           >
-            Sign Up
+            {t("auth.login.signup_link")}
           </Link>
         </p>
       </div>
