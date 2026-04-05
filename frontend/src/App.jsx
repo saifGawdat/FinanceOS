@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useTranslation } from "react-i18next";
 import Login from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Dashboard/Home";
@@ -23,6 +24,7 @@ import RecurringTransactions from "./pages/Dashboard/RecurringTransactions";
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -31,7 +33,9 @@ const ProtectedRoute = ({ children }) => {
           <div className="absolute inset-0 rounded-full border-4 border-white/5" />
           <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
         </div>
-        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">FinanceOS Security Check</p>
+        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">
+          {t("system.security_check")}
+        </p>
       </div>
     );
   }
@@ -136,6 +140,7 @@ export default App;
 
 const Root = () => {
   const { isAuthenticated, loading } = useAuth();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -144,7 +149,9 @@ const Root = () => {
           <div className="absolute inset-0 rounded-full border-4 border-white/5" />
           <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
         </div>
-        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">FinanceOS Integrity Check</p>
+        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">
+          {t("system.integrity_check")}
+        </p>
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -27,6 +28,7 @@ import {
 } from "react-icons/io5";
 
 const Expense = () => {
+  const { t } = useTranslation();
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -231,13 +233,12 @@ const Expense = () => {
       { month, year },
       {
         onSuccess: () => {
-          setCopyStatus("Categories copied successfully!");
+          setCopyStatus(t("expense.copy_modal.success"));
         },
         onError: (err) => {
           console.error("Error copying categories:", err);
           setCopyStatus(
-            err.response?.data?.error ||
-              "Failed to copy categories. They might already exist or the previous month is empty.",
+            err.response?.data?.error || t("expense.copy_modal.error_exists"),
           );
         },
       },
@@ -247,16 +248,16 @@ const Expense = () => {
   return (
     <DashboardLayout>
       <div>
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6 gap-6 text-center md:text-left rtl:text-right">
           <div className="w-full">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-              Expense Management
+              {t("expense.title")}
             </h1>
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2 justify-center md:justify-start">
               <p className="text-gray-400">
                 {activeTab === "expenses"
-                  ? "Total Transactions: "
-                  : "Total Category Expenses: "}
+                  ? t("expense.total_transactions") + ": "
+                  : t("expense.total_category") + ": "}
                 <span
                   className={`${
                     activeTab === "expenses" ? "text-red-400" : "text-blue-400"
@@ -289,14 +290,14 @@ const Expense = () => {
                   className="flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   <IoDownloadOutline size={20} />
-                  Export to Excel
+                  {t("actions.export")}
                 </Button>
                 <Button
                   onClick={() => setIsModalOpen(true)}
                   className="flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   <IoAddCircleOutline size={20} />
-                  Add Expense
+                  {t("actions.add")}
                 </Button>
               </>
             ) : (
@@ -308,14 +309,14 @@ const Expense = () => {
                   disabled={isSubmitting}
                 >
                   <IoDownloadOutline size={20} className="rotate-180" />
-                  Copy from Past Month
+                  {t("expense.copy_past")}
                 </Button>
                 <Button
                   onClick={() => setShowCategoryModal(true)}
                   className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-500"
                 >
                   <IoAddCircleOutline size={20} />
-                  Add Category Spend
+                  {t("expense.add_category_spend")}
                 </Button>
               </div>
             )}
@@ -333,7 +334,7 @@ const Expense = () => {
             }`}
           >
             <IoListOutline size={18} />
-            Transactions
+            {t("expense.tabs.transactions")}
           </button>
           <button
             onClick={() => setActiveTab("categories")}
@@ -344,7 +345,7 @@ const Expense = () => {
             }`}
           >
             <IoGridOutline size={18} />
-            Categories
+            {t("expense.tabs.categories")}
           </button>
         </div>
 
@@ -359,9 +360,9 @@ const Expense = () => {
             {!loading && expenses.length > 0 && (
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/2 p-6 rounded-2xl border border-white/5">
                 {/* معلومات الصفحة - Page Info */}
-                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                  Showing <span className="text-white">{expenses.length}</span>{" "}
-                  of <span className="text-white">{totalItems}</span> records
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] text-left rtl:text-right">
+                  {t("pagination.showing")} <span className="text-white">{expenses.length}</span>{" "}
+                  {t("pagination.of")} <span className="text-white">{totalItems}</span> {t("pagination.transactions")}
                 </div>
 
                 {/* أزرار التنقل - Navigation Buttons */}
@@ -373,16 +374,16 @@ const Expense = () => {
                     disabled={currentPage === 1 || paginationLoading}
                     className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
-                    <span className="group-hover:-translate-x-0.5 transition-transform">
+                    <span className="group-hover:-translate-x-0.5 transition-transform rtl:rotate-180">
                       ←
                     </span>
-                    <span>Prev</span>
+                    <span>{t("pagination.previous")}</span>
                   </button>
 
-                  <div className="px-6 py-3 bg-white/5 border border-white/5 text-white text-[10px] font-black uppercase tracking-widest rounded-xl min-w-[140px] text-center shadow-inner">
+                  <div className="px-6 py-3 bg-white/5 border border-white/5 text-white text-[10px] font-black uppercase tracking-widest rounded-xl min-w-[140px] text-center shadow-inner tabular-nums">
                     {paginationLoading
-                      ? "Syncing..."
-                      : `Page ${currentPage} / ${totalPages}`}
+                      ? t("actions.loading")
+                      : t("pagination.page_x_of_y", { current: currentPage, total: totalPages })}
                   </div>
 
                   <button
@@ -392,8 +393,8 @@ const Expense = () => {
                     disabled={currentPage >= totalPages || paginationLoading}
                     className="px-6 py-3 bg-[#09090c] border border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 rounded-xl transition-all hover:bg-white/5 disabled:opacity-20 flex items-center gap-2 group"
                   >
-                    <span>Next</span>
-                    <span className="group-hover:translate-x-0.5 transition-transform">
+                    <span>{t("pagination.next")}</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform rtl:rotate-180">
                       →
                     </span>
                   </button>
@@ -421,7 +422,7 @@ const Expense = () => {
                         </h3>
                         {cat.isVirtual && (
                           <span className="text-[8px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full uppercase tracking-widest font-black border border-blue-500/20">
-                            Virtual
+                            {t("expense.category_card.virtual")}
                           </span>
                         )}
                       </div>
@@ -438,7 +439,7 @@ const Expense = () => {
                                 {formatCurrency(cat.amount)}
                               </p>
                               <p className="text-[8px] text-blue-500/40 font-black uppercase tracking-widest">
-                                Monthly Budget
+                                {t("expense.category_card.monthly_budget")}
                               </p>
                             </div>
                             <button
@@ -471,7 +472,7 @@ const Expense = () => {
 
                         {cat.amount === 0 && actualExpenses.length === 0 && (
                           <p className="text-[10px] text-gray-600 text-center py-8 font-black uppercase tracking-widest opacity-50">
-                            No Records Found
+                            {t("expense.category_card.no_records")}
                           </p>
                         )}
                       </div>
@@ -486,10 +487,10 @@ const Expense = () => {
               <Card className="p-6">
                 <h3 className="text-xl font-bold text-gray-100 mb-6 flex items-center gap-2">
                   <IoGridOutline className="text-blue-500" />
-                  Category Breakdown
+                  {t("expense.breakdown")}
                 </h3>
                 <p className="text-gray-500 text-center py-6 text-sm italic">
-                  No spend recorded
+                  {t("expense.no_spend")}
                 </p>
               </Card>
             )}
@@ -499,7 +500,7 @@ const Expense = () => {
                   <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
                     <IoGridOutline className="text-blue-500" size={16} />
                   </div>
-                  System Breakdown
+                  {t("expense.system_breakdown")}
                 </h3>
                 <div className="space-y-8">
                   {allCategoryNames.map((categoryName) => {
@@ -540,7 +541,7 @@ const Expense = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title="Add New Expense"
+          title={t("expense.add_new")}
         >
           <form onSubmit={handleSubmit}>
             {error && (
@@ -549,15 +550,15 @@ const Expense = () => {
               </div>
             )}
             <Input
-              label="Title"
+              label={t("common.title")}
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g., Groceries"
+              placeholder={t("common.title_placeholder")}
               required
             />
             <Input
-              label="Amount (£)"
+              label={`${t("common.amount")} (£)`}
               type="number"
               name="amount"
               value={formData.amount}
@@ -566,8 +567,8 @@ const Expense = () => {
               required
             />
             <div className="mb-4">
-              <label className="block text-gray-300 text-sm font-semibold mb-2">
-                Category <span className="text-red-400">*</span>
+              <label className="block text-gray-300 text-sm font-semibold mb-2 rtl:text-right">
+                {t("common.category")} <span className="text-red-400">*</span>
               </label>
               <select
                 name="category"
@@ -577,7 +578,7 @@ const Expense = () => {
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 cursor-pointer appearance-none shadow-inner"
               >
                 <option value="Other" className="bg-[#09090c] text-white">
-                  Other
+                  {t("common.other")}
                 </option>
                 {Array.isArray(userCategories) &&
                   userCategories
@@ -594,7 +595,7 @@ const Expense = () => {
               </select>
             </div>
             <Input
-              label="Date"
+              label={t("common.date")}
               type="date"
               name="date"
               value={formData.date}
@@ -602,20 +603,20 @@ const Expense = () => {
               required
             />
             <div className="mb-4">
-              <label className="block text-gray-300 text-sm font-semibold mb-2">
-                Description (Optional)
+              <label className="block text-gray-300 text-sm font-semibold mb-2 rtl:text-right">
+                {t("common.description")} ({t("common.optional")})
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Add notes..."
+                placeholder={t("common.notes_placeholder")}
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
               />
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Adding..." : "Add Expense"}
+              {isSubmitting ? t("actions.submitting") : t("expense.add_new")}
             </Button>
           </form>
         </Modal>
@@ -624,12 +625,12 @@ const Expense = () => {
         <Modal
           isOpen={showCategoryModal}
           onClose={() => setShowCategoryModal(false)}
-          title="Add Category Spend"
+          title={t("expense.add_category_spend")}
         >
           <form onSubmit={handleCategorySubmit}>
             <div className="mb-4">
-              <label className="block text-gray-300 font-semibold mb-2">
-                Category <span className="text-red-400">*</span>
+              <label className="block text-gray-300 font-semibold mb-2 rtl:text-right">
+                {t("common.category")} <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
@@ -642,7 +643,7 @@ const Expense = () => {
                   })
                 }
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
-                placeholder="e.g., Transportation, Repair, Equipment"
+                placeholder={t("common.category_placeholder")}
                 required
               />
               <datalist id="category-suggestions">
@@ -652,7 +653,7 @@ const Expense = () => {
               </datalist>
             </div>
             <Input
-              label="Amount (£)"
+              label={`${t("common.amount")} (£)`}
               type="number"
               value={categoryFormData.amount}
               onChange={(e) =>
@@ -665,8 +666,8 @@ const Expense = () => {
               required
             />
             <div className="mb-6">
-              <label className="block text-gray-300 text-sm font-semibold mb-2">
-                Description (Optional)
+              <label className="block text-gray-300 text-sm font-semibold mb-2 rtl:text-right">
+                {t("common.description")} ({t("common.optional")})
               </label>
               <textarea
                 value={categoryFormData.description}
@@ -678,7 +679,7 @@ const Expense = () => {
                 }
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/2 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                 rows="3"
-                placeholder="Optional notes..."
+                placeholder={t("common.notes_placeholder")}
               />
             </div>
             <Button
@@ -686,7 +687,7 @@ const Expense = () => {
               className="w-full"
               disabled={isCategorySubmitting}
             >
-              {isCategorySubmitting ? "Adding..." : "Add Category Spend"}
+              {isCategorySubmitting ? t("actions.submitting") : t("expense.add_category_spend")}
             </Button>
           </form>
         </Modal>
@@ -697,31 +698,29 @@ const Expense = () => {
           onClose={() => {
             if (!isDeleting) setDeleteExpenseId(null);
           }}
-          title="Delete Expense"
+          title={t("modals.delete_title")}
         >
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              Are you sure you want to permanently{" "}
-              <span className="font-semibold text-red-400">delete</span> this
-              expense? This action cannot be undone.
+            <p className="text-sm text-gray-300 rtl:text-right font-medium leading-relaxed">
+              {t("modals.delete_confirm")}
             </p>
             <div className="flex justify-end gap-3 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDeleteExpenseId(null)}
-                className="px-4"
+                className="px-4 font-bold"
                 disabled={isDeleting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={confirmDeleteExpense}
-                className="px-4"
+                className="px-4 font-bold bg-red-600 hover:bg-red-700"
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? t("actions.deleting") : t("actions.delete")}
               </Button>
             </div>
           </div>
@@ -733,33 +732,29 @@ const Expense = () => {
           onClose={() => {
             if (!isDeleting) setDeleteCategoryId(null);
           }}
-          title="Delete Category Spend"
+          title={t("modals.delete_title")}
         >
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              Are you sure you want to{" "}
-              <span className="font-semibold text-red-400">
-                delete this category spend
-              </span>
-              ? This will remove its budget for the selected month.
+            <p className="text-sm text-gray-300 rtl:text-right font-medium leading-relaxed">
+              {t("modals.delete_confirm")}
             </p>
             <div className="flex justify-end gap-3 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDeleteCategoryId(null)}
-                className="px-4"
+                className="px-4 font-bold"
                 disabled={isDeleting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={confirmDeleteCategory}
-                className="px-4"
+                className="px-4 font-bold bg-red-600 hover:bg-red-700"
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? t("actions.deleting") : t("actions.delete")}
               </Button>
             </div>
           </div>
@@ -773,19 +768,16 @@ const Expense = () => {
               setShowCopyModal(false);
             }
           }}
-          title="Copy Categories from Previous Month"
+          title={t("expense.copy_modal.title")}
         >
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              This will copy all category budgets from{" "}
-              <span className="font-semibold text-blue-400">
-                {month === 1 ? 12 : month - 1}/{month === 1 ? year - 1 : year}
-              </span>{" "}
-              into{" "}
-              <span className="font-semibold text-blue-400">
-                {month}/{year}
-              </span>
-              . Existing categories in the current month are not allowed.
+            <p className="text-sm text-gray-300 rtl:text-right font-medium leading-relaxed">
+              {t("expense.copy_modal.description", {
+                prevMonth: month === 1 ? 12 : month - 1,
+                prevYear: month === 1 ? year - 1 : year,
+                currentMonth: month,
+                currentYear: year
+              })}
             </p>
 
             {copyStatus && (
@@ -799,18 +791,18 @@ const Expense = () => {
                 type="button"
                 variant="outline"
                 onClick={() => setShowCopyModal(false)}
-                className="px-4"
+                className="px-4 font-bold"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={confirmCopyPreviousMonthCategories}
-                className="px-4"
+                className="px-4 font-bold"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Copying..." : "Copy Categories"}
+                {isSubmitting ? t("actions.loading") : t("expense.copy_past")}
               </Button>
             </div>
           </div>

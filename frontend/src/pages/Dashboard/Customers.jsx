@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { useTranslation } from "react-i18next";
 import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -19,6 +20,7 @@ import { formatCurrency } from "../../utils/formatters";
 
 
 const Customers = () => {
+  const { t, i18n } = useTranslation();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -195,20 +197,7 @@ const Customers = () => {
     XLSX.writeFile(wb, `Customers_${selectedMonth}_${selectedYear}.xlsx`);
   };
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const months = t("months", { returnObjects: true });
 
   const years = Array.from(
     { length: 5 },
@@ -219,12 +208,12 @@ const Customers = () => {
     <DashboardLayout>
       <div className="p-8 max-w-[1440px] mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-12">
-          <div className="text-center lg:text-left w-full lg:w-auto">
+          <div className="text-center lg:text-left rtl:text-right w-full lg:w-auto">
             <h1 className="text-4xl font-black text-white tracking-tight uppercase">
-              Subscriber <span className="text-gray-500">Registry</span>
+              {t("customers.title")} <span className="text-gray-500">{t("customers.subtitle")}</span>
             </h1>
             <p className="text-[10px] font-black text-gray-500 mt-2 uppercase tracking-[0.2em]">
-              Monthly recurring revenue and collection lifecycle
+              {t("customers.description")}
             </p>
           </div>
 
@@ -260,7 +249,7 @@ const Customers = () => {
               className="flex items-center gap-2 px-6 py-3 font-black text-[10px] uppercase tracking-widest"
             >
               <IoDownloadOutline size={16} />
-              <span>Export</span>
+              <span>{t("customers.export")}</span>
             </Button>
             <Button
               onClick={() => {
@@ -276,7 +265,7 @@ const Customers = () => {
               className="flex items-center gap-2 px-6 py-3 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20"
             >
               <IoAddOutline size={20} />
-              <span>Provision</span>
+              <span>{t("customers.provision")}</span>
             </Button>
           </div>
         </div>
@@ -285,7 +274,7 @@ const Customers = () => {
           <div className="flex flex-col items-center justify-center p-24 bg-[#0e0e12] rounded-2xl border border-white/5">
             <div className="w-12 h-12 border-2 border-white/5 border-t-blue-500 rounded-full animate-spin mb-6"></div>
             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-              Synchronizing Customer Core...
+              {t("customers.syncing")}
             </p>
           </div>
         ) : (
@@ -323,12 +312,12 @@ const Customers = () => {
                           {paid ? (
                             <>
                               <IoCheckmarkCircleOutline size={12} />
-                              Cleared
+                              {t("customers.status.cleared")}
                             </>
                           ) : (
                             <>
                               <IoCloseCircleOutline size={12} />
-                              Pending
+                              {t("customers.status.pending")}
                             </>
                           )}
                         </div>
@@ -336,25 +325,25 @@ const Customers = () => {
 
                       <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
                         <div className="space-y-1">
-                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Identification</p>
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.id")}</p>
                           <p className="text-xs font-bold text-gray-300">{customer.phoneNumber}</p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Yield</p>
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.yield")}</p>
                           <p className="text-lg font-black text-blue-500">
                             {formatCurrency(parseFloat(customer.monthlyAmount))}
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Last Activity</p>
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.activity")}</p>
                           <p className="text-xs font-bold text-gray-300">
                             {customer.lastPaidDate
-                              ? new Date(customer.lastPaidDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                              : "No Record"}
+                              ? new Date(customer.lastPaidDate).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), { month: "short", day: "numeric", year: "numeric" })
+                              : t("customers.labels.no_record")}
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">SLA Deadline</p>
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.deadline")}</p>
                           <p
                             className={`text-xs font-black ${
                               !paid &&
@@ -365,13 +354,13 @@ const Customers = () => {
                             }`}
                           >
                             {customer.paymentDeadline
-                              ? new Date(customer.paymentDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                              : "Unrestricted"}
+                              ? new Date(customer.paymentDeadline).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), { month: "short", day: "numeric", year: "numeric" })
+                              : t("customers.labels.unrestricted")}
                           </p>
                         </div>
                         <div className="space-y-1 hidden lg:block">
-                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">LTV Analysis</p>
-                          <p className="text-xs font-bold text-gray-500 italic">Processing...</p>
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.ltv")}</p>
+                          <p className="text-xs font-bold text-gray-500 italic">{t("customers.labels.processing")}</p>
                         </div>
                       </div>
                     </div>
@@ -383,7 +372,7 @@ const Customers = () => {
                           className="flex-1 xl:flex-none bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-3 px-8 py-3 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-600/20"
                         >
                           <IoCashOutline size={18} />
-                          <span>Clear Due</span>
+                          <span>{t("customers.actions.clear_due")}</span>
                         </Button>
                       ) : (
                         <Button
@@ -392,7 +381,7 @@ const Customers = () => {
                           className="flex-1 xl:flex-none text-red-500 hover:bg-red-500/10 border-red-500/20 flex items-center justify-center gap-3 px-8 py-3 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all"
                         >
                           <IoCloseCircleOutline size={18} />
-                          <span>Revert</span>
+                          <span>{t("customers.actions.revert")}</span>
                         </Button>
                       )}
                       <div className="flex gap-2">
@@ -401,21 +390,21 @@ const Customers = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-3 text-gray-500 hover:text-emerald-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
-                          title="WhatsApp Dispatch"
+                          title={t("customers.actions.whatsapp")}
                         >
                           <IoLogoWhatsapp size={18} />
                         </a>
                         <button
                           onClick={() => handleEdit(customer)}
                           className="p-3 text-gray-500 hover:text-blue-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
-                          title="Modify Entry"
+                          title={t("customers.actions.modify")}
                         >
                           <IoPencilOutline size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(customer._id)}
                           className="p-3 text-gray-500 hover:text-red-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
-                          title="Terminate Record"
+                          title={t("customers.actions.terminate")}
                         >
                           <IoTrashOutline size={18} />
                         </button>
@@ -429,7 +418,7 @@ const Customers = () => {
             {customers.length === 0 && (
               <div className="bg-[#0e0e12] rounded-2xl p-24 text-center border-2 border-dashed border-white/5">
                 <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest italic">
-                  Registry is currently void of active subscribers.
+                  {t("customers.labels.registry_void")}
                 </p>
               </div>
             )}
@@ -438,7 +427,7 @@ const Customers = () => {
             {!loading && customers.length > 0 && (
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 bg-[#0e0e12] p-6 rounded-2xl border border-white/5 shadow-2xl">
                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                  Index <span className="text-blue-500">{customers.length}</span> / <span className="text-blue-500">{totalItems}</span> Entities
+                  {t("customers.index")} <span className="text-blue-500">{customers.length}</span> / <span className="text-blue-500">{totalItems}</span> {t("customers.entities")}
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -451,7 +440,7 @@ const Customers = () => {
                   </button>
 
                   <div className="px-6 py-2.5 bg-blue-500/5 border border-blue-500/10 text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest min-w-[150px] text-center shadow-inner">
-                    {paginationLoading ? "QUERYING..." : `Sector ${currentPage} OF ${totalPages}`}
+                    {paginationLoading ? t("customers.querying") : `${t("customers.sector")} ${currentPage} ${t("customers.of")} ${totalPages}`}
                   </div>
 
                   <button
@@ -483,7 +472,7 @@ const Customers = () => {
             paymentDeadline: "",
           });
         }}
-        title={editingCustomer ? "Calibrate Subscriber" : "Provision New Entity"}
+        title={editingCustomer ? t("customers.form.edit_title") : t("customers.form.add_title")}
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -493,29 +482,29 @@ const Customers = () => {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
-              label="Legal Identity"
+              label={t("customers.form.identity")}
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Full Entity Name"
+              placeholder={t("customers.form.identity_placeholder")}
             />
             <Input
-              label="Trade Marker"
+              label={t("customers.form.trade")}
               value={formData.brandName}
               onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-              placeholder="Commercial Brand"
+              placeholder={t("customers.form.trade_placeholder")}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
-              label="Communication Line"
+              label={t("customers.form.comm_line")}
               required
               value={formData.phoneNumber}
               onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
               placeholder="+00 000 000 000"
             />
             <Input
-              label="Monthly Commitment"
+              label={t("customers.form.commitment")}
               required
               type="number"
               value={formData.monthlyAmount}
@@ -524,7 +513,7 @@ const Customers = () => {
             />
           </div>
           <Input
-            label="SLA Deadline"
+            label={t("customers.form.deadline")}
             type="date"
             value={formData.paymentDeadline}
             onChange={(e) => setFormData({ ...formData, paymentDeadline: e.target.value })}
@@ -535,10 +524,10 @@ const Customers = () => {
               onClick={() => setShowAddModal(false)}
               className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest"
             >
-              Abort
+              {t("customers.form.abort")}
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1 py-4 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-500/20">
-              {isSubmitting ? "PROCESSING..." : editingCustomer ? "SYNC CHANGES" : "PROVISION"}
+              {isSubmitting ? t("customers.form.processing") : editingCustomer ? t("customers.form.sync_changes") : t("customers.provision")}
             </Button>
           </div>
         </form>
@@ -552,29 +541,23 @@ const Customers = () => {
             setConfirmModal({ open: false, type: null, customerId: null });
           }
         }}
-        title="Override Confirmation"
+        title={t("customers.confirm.title")}
       >
         <div className="space-y-6">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wide leading-relaxed">
             {confirmModal.type === "pay" && (
               <>
-                Confirm capital injection for the period{" "}
-                <span className="text-blue-500 font-black">
-                  {selectedMonth}/{selectedYear}
-                </span>{" "}
-                from this entity?
+                {t("customers.confirm.pay_text", { date: `${selectedMonth}/${selectedYear}` })}
               </>
             )}
             {confirmModal.type === "unpay" && (
               <>
-                Confirm ledger reversal? This will treat the current period as{" "}
-                <span className="text-red-500 font-black">UNSETTLED</span>.
+                {t("customers.confirm.unpay_text")}
               </>
             )}
             {confirmModal.type === "delete" && (
               <>
-                Initiate record termination? This action is{" "}
-                <span className="text-red-500 font-black">IRREVERSIBLE</span> and will purge historical subscription data.
+                {t("customers.confirm.delete_text")}
               </>
             )}
           </p>
@@ -587,7 +570,7 @@ const Customers = () => {
               className="px-8 py-3 font-black uppercase text-[10px] tracking-widest"
               disabled={isConfirming}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -597,7 +580,7 @@ const Customers = () => {
               }`}
               disabled={isConfirming}
             >
-              {isConfirming ? "QUERYING..." : "CONFIRM"}
+              {isConfirming ? t("customers.querying") : t("actions.confirm")}
             </Button>
           </div>
         </div>

@@ -1,8 +1,9 @@
 export const formatCurrency = (amount) => {
+  const val = typeof amount === 'number' ? amount : Number(amount || 0);
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
-  }).format(amount);
+  }).format(val);
 };
 
 export const formatDate = (date) => {

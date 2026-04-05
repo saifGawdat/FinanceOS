@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Modal from "../../components/ui/Modal";
+import { useTranslation } from "react-i18next";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
@@ -74,14 +75,18 @@ const SummaryCard = ({ label, amount, icon, color }) => {
 };
 
 
-const DayBadge = ({ day }) => (
-  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-300">
-    <IoRepeatOutline size={12} className="text-gray-500" />
-    {ORDINALS[day - 1]?.label} of month
-  </span>
-);
+const DayBadge = ({ day }) => {
+  const { t } = useTranslation();
+  return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-300">
+      <IoRepeatOutline size={12} className="text-gray-500" />
+      {t("recurring.day_of_month", { label: ORDINALS[day - 1]?.label })}
+    </span>
+  );
+};
 
 const RecurringCard = ({ item, onEdit, onToggle, onDelete, isToggling, isDeleting }) => {
+  const { t } = useTranslation();
   const isIncome = item.type === "income";
 
   return (
@@ -99,12 +104,12 @@ const RecurringCard = ({ item, onEdit, onToggle, onDelete, isToggling, isDeletin
         {item.isActive ? (
           <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Active
+            {t("recurring.active")}
           </span>
         ) : (
           <span className="flex items-center gap-1 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-gray-600" />
-            Paused
+            {t("recurring.paused")}
           </span>
         )}
       </div>
@@ -155,7 +160,7 @@ const RecurringCard = ({ item, onEdit, onToggle, onDelete, isToggling, isDeletin
           ) : (
             <IoCheckmarkCircle size={16} />
           )}
-          {item.isActive ? "Pause" : "Resume"}
+          {item.isActive ? t("recurring.actions.pause") : t("recurring.actions.resume")}
         </button>
 
         <button
@@ -163,7 +168,7 @@ const RecurringCard = ({ item, onEdit, onToggle, onDelete, isToggling, isDeletin
           className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-all"
         >
           <IoPencilOutline size={16} />
-          Edit
+          {t("actions.edit")}
         </button>
 
         <button
@@ -172,31 +177,34 @@ const RecurringCard = ({ item, onEdit, onToggle, onDelete, isToggling, isDeletin
           className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
         >
           <IoTrashOutline size={16} />
-          Delete
+          {t("actions.delete")}
         </button>
       </div>
     </div>
   );
 };
 
-const EmptyState = ({ type }) => (
-  <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-    <div className="w-20 h-20 rounded-2xl bg-white/3 border border-white/5 flex items-center justify-center mb-5">
-      <IoRepeatOutline size={36} className="text-gray-700" />
+const EmptyState = ({ type }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-20 h-20 rounded-2xl bg-white/3 border border-white/5 flex items-center justify-center mb-5">
+        <IoRepeatOutline size={36} className="text-gray-700" />
+      </div>
+      <h3 className="text-lg font-bold text-gray-400 mb-2">
+        {t("recurring.no_records", { type: type === "income" ? t("income.title") : t("expense.title") })}
+      </h3>
+      <p className="text-sm text-gray-600 max-w-xs">
+        {t("recurring.empty_desc")}
+      </p>
     </div>
-    <h3 className="text-lg font-bold text-gray-400 mb-2">
-      No recurring {type}s yet
-    </h3>
-    <p className="text-sm text-gray-600 max-w-xs">
-      Add your first recurring {type} — things like rent, subscriptions, or
-      monthly salary.
-    </p>
-  </div>
-);
+  );
+};
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 const RecurringTransactions = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("expense");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -293,27 +301,27 @@ const RecurringTransactions = () => {
                 <IoRepeatOutline size={18} className="text-blue-400" />
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-gray-100">
-                Recurring
+                {t("recurring.title")}
               </h1>
             </div>
-            <p className="text-sm text-gray-600 ml-12">
-              Monthly transactions that repeat automatically
+            <p className="text-sm text-gray-600 ml-12 rtl:mr-12 rtl:ml-0">
+              {t("recurring.subtitle")}
             </p>
           </div>
 
           <Button
             onClick={openAdd}
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2 shrink-0 font-bold"
           >
             <IoAddCircleOutline size={20} />
-            Add Recurring
+            {t("recurring.add_new")}
           </Button>
         </div>
 
         {/* ── Summary Bar ──────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <SummaryCard
-            label="Monthly Income"
+            label={t("recurring.income_tab")}
             amount={totalRecurringIncome}
             icon={IoWalletOutline}
             color={{
@@ -324,7 +332,7 @@ const RecurringTransactions = () => {
             }}
           />
           <SummaryCard
-            label="Monthly Expenses"
+            label={t("recurring.expense_tab")}
             amount={totalRecurringExpense}
             icon={IoCartOutline}
             color={{
@@ -353,7 +361,7 @@ const RecurringTransactions = () => {
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">
-                Net Recurring
+                {t("recurring.net")}
               </p>
               <p
                 className={`text-2xl font-black ${
@@ -387,7 +395,7 @@ const RecurringTransactions = () => {
                 ) : (
                   <IoCartOutline size={16} />
                 )}
-                {tab}
+                {tab === "income" ? t("income.title") : t("expense.title")}
                 <span
                   className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
                     activeTab === tab
@@ -438,32 +446,32 @@ const RecurringTransactions = () => {
         <Modal
           isOpen={isFormOpen}
           onClose={() => !isSaving && setIsFormOpen(false)}
-          title={editingItem ? "Edit Recurring" : "Add Recurring"}
+          title={editingItem ? t("recurring.edit_title") : t("recurring.add_new")}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Type selector — only show on Add */}
             {!editingItem && (
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Type
+                <label className="block text-gray-300 text-sm font-medium mb-2 rtl:text-right">
+                  {t("recurring.form.type")}
                 </label>
                 <div className="flex gap-2 p-1 bg-white/3 border border-white/5 rounded-xl">
-                  {["income", "expense"].map((t) => (
+                  {["income", "expense"].map((type) => (
                     <button
-                      key={t}
+                      key={type}
                       type="button"
                       onClick={() =>
-                        handleChange({ target: { name: "type", value: t } })
+                        handleChange({ target: { name: "type", value: type } })
                       }
                       className={`flex-1 py-2 rounded-lg text-sm font-bold capitalize transition-all ${
-                        formData.type === t
-                          ? t === "income"
+                        formData.type === type
+                          ? type === "income"
                             ? "bg-emerald-600 text-white"
                             : "bg-red-600 text-white"
                           : "text-gray-500 hover:text-gray-300"
                       }`}
                     >
-                      {t}
+                      {type === "income" ? t("income.title") : t("expense.title")}
                     </button>
                   ))}
                 </div>
@@ -471,16 +479,16 @@ const RecurringTransactions = () => {
             )}
 
             <Input
-              label="Title"
+              label={t("recurring.form.title")}
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g. Monthly Rent"
+              placeholder={t("common.title_placeholder")}
               required
             />
 
             <Input
-              label="Amount (£)"
+              label={`${t("recurring.form.amount")} (£)`}
               type="number"
               name="amount"
               value={formData.amount}
@@ -493,8 +501,8 @@ const RecurringTransactions = () => {
 
             {/* Category select */}
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
-                Category
+              <label className="block text-gray-300 text-sm font-medium mb-2 rtl:text-right">
+                {t("recurring.form.category")}
               </label>
               <select
                 name="category"
@@ -504,7 +512,7 @@ const RecurringTransactions = () => {
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 appearance-none"
               >
                 <option value="" disabled className="bg-[#09090c]">
-                  Select category
+                  {t("recurring.form.select_category")}
                 </option>
                 {categories.map((c) => (
                   <option key={c} value={c} className="bg-[#09090c]">
@@ -516,8 +524,8 @@ const RecurringTransactions = () => {
 
             {/* Day of month select */}
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
-                Day of Month
+              <label className="block text-gray-300 text-sm font-medium mb-2 rtl:text-right">
+                {t("recurring.form.day")}
               </label>
               <select
                 name="dayOfMonth"
@@ -532,35 +540,33 @@ const RecurringTransactions = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-[10px] text-gray-600 mt-1.5">
-                Days capped at 28th to work across all months
+              <p className="text-[10px] text-gray-600 mt-1.5 rtl:text-right">
+                {t("recurring.form.day_hint")}
               </p>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
-                Description{" "}
-                <span className="text-gray-600 font-normal">(Optional)</span>
+              <label className="block text-gray-300 text-sm font-medium mb-2 rtl:text-right">
+                {t("common.description")}{" "}
+                <span className="text-gray-600 font-normal">({t("common.optional")})</span>
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Add notes..."
+                placeholder={t("common.notes_placeholder")}
                 rows={2}
                 className="w-full px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 resize-none"
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSaving}>
+            <Button type="submit" className="w-full font-bold" disabled={isSaving}>
               {isSaving
-                ? editingItem
-                  ? "Saving..."
-                  : "Adding..."
+                ? t("actions.loading")
                 : editingItem
-                  ? "Save Changes"
-                  : "Add Recurring"}
+                  ? t("recurring.form.save_changes")
+                  : t("recurring.form.add_recurring")}
             </Button>
           </form>
         </Modal>
@@ -569,13 +575,11 @@ const RecurringTransactions = () => {
         <Modal
           isOpen={!!deleteId}
           onClose={() => !deleteMutation.isPending && setDeleteId(null)}
-          title="Delete Recurring"
+          title={t("modals.delete_title")}
         >
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              Are you sure you want to permanently{" "}
-              <span className="font-semibold text-red-400">delete</span> this
-              recurring transaction? This action cannot be undone.
+            <p className="text-sm text-gray-300 rtl:text-right font-medium leading-relaxed">
+              {t("modals.delete_confirm")}
             </p>
             <div className="flex justify-end gap-3">
               <Button
@@ -583,19 +587,21 @@ const RecurringTransactions = () => {
                 variant="outline"
                 onClick={() => setDeleteId(null)}
                 disabled={deleteMutation.isPending}
+                className="font-bold"
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="button"
                 disabled={deleteMutation.isPending}
+                className="font-bold bg-red-600 hover:bg-red-700"
                 onClick={() =>
                   deleteMutation.mutate(deleteId, {
                     onSuccess: () => setDeleteId(null),
                   })
                 }
               >
-                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                {deleteMutation.isPending ? t("actions.deleting") : t("actions.delete")}
               </Button>
             </div>
           </div>
