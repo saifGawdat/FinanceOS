@@ -26,7 +26,8 @@
     "error_process": "عذراً، حدث خطأ أثناء المعالجة.",
     "success_process": "تمت العملية بنجاح!",
     "filter": "تصفية حسب",
-    "loading": "جاري التحميل..."
+    "loading": "جاري التحميل...",
+    "locale_tag": "ar-EG"
   },
   "settings": {
     "title": "إعدادات الواجهة",

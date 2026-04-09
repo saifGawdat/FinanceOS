@@ -338,7 +338,7 @@ const Customers = () => {
                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.activity")}</p>
                           <p className="text-xs font-bold text-gray-300">
                             {customer.lastPaidDate
-                              ? new Date(customer.lastPaidDate).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), { month: "short", day: "numeric", year: "numeric" })
+                              ? new Date(customer.lastPaidDate).toLocaleDateString(t("common.locale_tag", { defaultValue: i18n.language === "ar" ? "ar-EG" : "en-US" }), { month: "short", day: "numeric", year: "numeric" })
                               : t("customers.labels.no_record")}
                           </p>
                         </div>
@@ -354,7 +354,7 @@ const Customers = () => {
                             }`}
                           >
                             {customer.paymentDeadline
-                              ? new Date(customer.paymentDeadline).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), { month: "short", day: "numeric", year: "numeric" })
+                              ? new Date(customer.paymentDeadline).toLocaleDateString(t("common.locale_tag", { defaultValue: i18n.language === "ar" ? "ar-EG" : "en-US" }), { month: "short", day: "numeric", year: "numeric" })
                               : t("customers.labels.unrestricted")}
                           </p>
                         </div>

@@ -42,7 +42,7 @@ const MonthlySalaries = () => {
   );
 
   const getMonthName = (monthNum) => {
-    return new Date(2000, monthNum - 1).toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", {
+    return new Date(2000, monthNum - 1).toLocaleDateString(t("common.locale_tag", { defaultValue: i18n.language === "ar" ? "ar-EG" : "en-US" }), {
       month: "long",
     });
   };

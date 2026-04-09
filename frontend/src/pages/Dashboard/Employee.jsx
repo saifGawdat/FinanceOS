@@ -246,7 +246,7 @@ const Employee = () => {
   };
   const formatDate = (dateString) => {
     if (!dateString) return t("employees.table.no_phone");
-    return new Date(dateString).toLocaleDateString(t("common.locale_tag") || (i18n.language === "ar" ? "ar-EG" : "en-US"), {
+    return new Date(dateString).toLocaleDateString(t("common.locale_tag", { defaultValue: i18n.language === "ar" ? "ar-EG" : "en-US" }), {
       year: "numeric",
       month: "short",
       day: "numeric",

@@ -93,7 +93,7 @@ const Home = () => {
           <p className="text-gray-500 text-sm mt-1.5 font-medium">
             {t("home.subtitle")}{" "}
             <span className="text-blue-400">
-              {new Date(year, month - 1).toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", {
+              {new Date(year, month - 1).toLocaleDateString(t("common.locale_tag", { defaultValue: i18n.language === "ar" ? "ar-EG" : "en-US" }), {
                 month: "long",
                 year: "numeric",
               })}

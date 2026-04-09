@@ -26,7 +26,8 @@
     "error_process": "Sorry, an error occurred during processing.",
     "success_process": "Success!",
     "filter": "Filter by",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "locale_tag": "en-US"
   },
   "settings": {
     "title": "System Configuration",
