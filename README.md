@@ -1,160 +1,119 @@
-# 💰 Expense Tracker - Enterprise Management System
+# 💰 FinanceOS - Enterprise Financial System
 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=google-chrome&logoColor=white)](https://frontend-ksrqkq.taqnihub.cloud/)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![React 19](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Google Gemini](https://img.shields.io/badge/Gemini_AI-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://deepmind.google/technologies/gemini/)
 
-A robust, enterprise-grade financial management solution built with the MERN stack. Designed to streamline business operations, this platform offers comprehensive tracking for incomes, expenses, customers, and employees, all presented through a dynamic and intuitive dashboard.
+A sophisticated, enterprise-grade financial management solution built with modern **TypeScript MERN Stack**. Designed for seamless business operations, this platform integrates **Generative AI** for financial insights and robust **multi-language (RTL)** support.
 
 ---
 
-## 🚀 Key Features
+## 🌟 Key Features
 
-### 📊 Powerful Financial Dashboard
+### 🤖 Generative AI Assistant (Gemini)
+- **Financial Chat**: Interact with an AI assistant for real-time analysis of your spending patterns and budget optimization.
+- **Voice Transcription**: Transcribe audio notes directly into the system for hands-free transaction logging.
+- **Predictive Insights**: Advanced forecasting for upcoming financial trends based on historical data.
 
-- **Real-time Analytics**: Instant visibility into net profit, total income, and expenditures.
-- **Interactive Visualizations**: High-quality charts powered by **Recharts** for trend analysis.
-- **Recent Transactions**: Quick view of latest financial activities.
+### 🔄 Recurring Transaction Engine
+- **Automated Logging**: Schedule monthly income and expenses once and let the system handle the rest.
+- **Dynamic Controls**: Toggle recurring items on/off with enterprise-grade status management.
+- **Precise Scheduling**: Select exact dates for monthly renewals to ensure accurate cash flow forecasting.
 
-### 👥 Customer Relationship Management (CRM)
+### 🌍 Global Ready (Multi-language & RTL)
+- **Local Language Support**: Fully localized in **English** and **Arabic**.
+- **RTL Optimization**: Pixel-perfect Right-to-Left (RTL) layout support for an authentic Arabic-speaking user experience.
+- **Seamless Switching**: Instant locale management without page reloads.
 
-- **Payment Tracking**: Specialized module to track monthly customer payments and brand history.
-- **Status Indicators**: Visual cues (Paid/Unpaid) to manage accounts receivable efficiently.
-- **Data Export**: Seamlessly export customer databases to **Excel (.xlsx)** for offline reporting.
+### 📊 Strategic Financial Dashboard
+- **Real-time Analytics**: Holistic view of net profit, total liquidity, and burn rate.
+- **Interactive Visualizations**: High-fidelity charts powered by **Recharts**.
+- **Customer & HR Management**: Integrated CRM for tracking payments and a dedicated HR module for payroll management.
 
-### 👔 Human Resources (HR) & Payroll
-
-- **Staff Records**: Centralized management for employee profiles and documentation.
-- **Salary Tracking**: Dedicated system for tracking monthly salaries and transaction history.
-- **Financial History**: Detailed log of all employee-related payouts.
-
-### � Progressive Web App (PWA)
-
-- **Native Experience**: Installable on both mobile and desktop for a native-like app feel.
-- **Offline Access**: Access the dashboard and view cached data even without an active internet connection.
-- **Premium Iconography**: Custom-designed 512x512 app icon for high-density displays.
-- **One-Click Install**: Strategic installation logic integrated into the Settings dashboard.
-
-### 🔐 Security & Architecture
-
-- **JWT Authentication**: Secure user sessions with JSON Web Tokens.
-- **RESTful API**: Clean, documented backend routes for modular scalability.
-- **Responsive Design**: Tailored for both desktop and mobile productivity using Tailwind CSS.
+### 📱 Progressive Web App (PWA)
+- **Enterprise Mobility**: Installable as a native app on iOS, Android, and Windows.
+- **Offline Resiliency**: Access your financial data and cached dashboards even in zero-connectivity environments.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend
-
-- **Framework:** React 19 (Vite)
-- **Styling:** Tailwind CSS
-- **PWA:** Vite-PWA Integration
-- **Charts:** Recharts
-- **Data Export:** XLSX Library
-- **Authentication:** JWT-Decode, Axios
+- **Core:** React 19 (Vite)
+- **Typing:** TypeScript
+- **Styling:** Tailwind CSS (Enterprise Design System)
+- **State:** Context API + Axios
+- **Intl:** i18next (RTL Support)
 
 ### Backend
-
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose
-- **Security:** Bcrypt (Hashing), JWT (Sessions)
+- **Core:** Node.js (TypeScript)
+- **API:** Express.js
+- **Intelligence:** Google Gemini AI SDK
+- **Database:** MongoDB (Mongoose)
+- **Auth:** JWT + Bcrypt
 
 ---
 
-## 📦 Project Structure
+## ⚙️ Configuration
 
-```text
-expense-tracker/
-├── backend/
-│   ├── config/         # Database & environment configuration
-│   ├── controllers/    # Business logic for all API routes
-│   ├── middleware/     # Auth and error-handling middleware
-│   ├── models/         # Mongoose schemas for MongoDB
-│   ├── routes/         # Express API route definitions
-│   └── server.js       # Backend entry point
-├── frontend/
-│   ├── src/
-│   │   ├── api/        # Axios service configurations
-│   │   ├── components/ # Reusable UI & Dashboard components
-│   │   ├── pages/      # View components (Dashboard, HR, CRM)
-│   │   ├── context/    # Global state management
-│   │   └── utils/      # Helper functions (Formatting, Exports)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MONGO_URI` | MongoDB Connection String | `REQUIRED` |
+| `JWT_SECRET` | Secret key for session encryption | `REQUIRED` |
+| `GEMINI_API_KEY` | API Key for Google Gemini Insights | `REQUIRED` |
+| `PORT` | Backend server port | `5000` |
+| `VITE_API_URL` | Frontend API endpoint | `http://localhost:5000/api` |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Backend Setup
+```bash
+cd backend
+npm install
+npm run build
+npm run start
+```
+
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## 📂 Project Structure
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- MongoDB Atlas account or local MongoDB instance
-- npm or yarn
-
-### 🔧 Backend Configuration
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file from the example:
-   ```bash
-   cp .env.example .env
-   ```
-4. Update your `.env` with your credentials:
-   ```env
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   PORT=5000
-   FRONTEND_URL=http://localhost:5173
-   ```
-5. Start the server:
-   ```bash
-   npm run dev
-   ```
-
-### 🎨 Frontend Configuration
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file:
-   ```bash
-   # Note: For Vite, use VITE_ prefix for environment variables
-   echo "VITE_API_URL=http://localhost:5000/api" > .env
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+```text
+├── backend/
+│   ├── src/
+│   │   ├── controllers/    # AI, Auth, and Financial logic
+│   │   ├── routes/         # AI, Recurring, and Analytics routes
+│   │   ├── services/       # External API integrations (Gemini)
+│   │   └── models/         # TypeScript Mongoose Schemas
+├── frontend/
+│   ├── src/
+│   │   ├── locales/        # English/Arabic translation keys
+│   │   ├── pages/          # Dashboard, Goals, and AI Chat UI
+│   │   └── components/     # Reusable UI fragments
+```
 
 ---
 
-## 🛣 Roadmap & Future Features
+## 📄 License & Credits
 
-- [ ] **Multi-currency Support**: Handle various international currencies with real-time exchange rates.
-- [ ] **AI Financial Insights**: Predictive analysis for expense forecasting.
-- [x] **PWA Integration**: Transform into a Progressive Web App for offline mobile usage.
-- [ ] **Advanced Invoicing**: Generate and email PDFs directly to customers.
+Distributed under the MIT License. Developed and maintained by **[Saif Gawdat](https://github.com/saifGawdat)**.
 
 ---
 
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+> [!TIP]
+> **AI Optimization**: This repository is optimized for AI-driven development. For LLM agents, please refer to our [llms.txt](./llms.txt) for a structured architectural overview.
 
 ---
 

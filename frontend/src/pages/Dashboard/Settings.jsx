@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Modal from "../../components/ui/Modal";
+import Button from "../../components/ui/Button";
 import { useAuth } from "../../context/AuthContext";
 import {
   IoTrashOutline,
@@ -328,13 +329,29 @@ const Settings = () => {
           onClose={() => setShowInstallModal(false)}
           title={t("settings.modals.pwa_title")}
         >
-          <div className="space-y-8 p-4 rtl:text-right">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+          <div className="space-y-8 p-4">
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-blue-500/20 blur-2xl rounded-full group-hover:bg-blue-500/30 transition-all"></div>
+                <img 
+                  src="/icon-512.png" 
+                  alt="FinanceOS Icon" 
+                  className="w-32 h-32 rounded-[2rem] shadow-2xl relative border border-white/10"
+                />
+              </div>
+              <div className="mt-8 text-center">
+                <h3 className="text-xl font-black text-white uppercase tracking-tight">FinanceOS</h3>
+                <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mt-1 italic">Enterprise Mobility Ready</p>
+              </div>
+            </div>
+
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed text-center px-4">
               {t("settings.modals.pwa_confirm")}
             </p>
+
             {installError && (
-              <div className="text-[10px] font-black px-5 py-4 rounded-xl bg-red-500/5 border border-red-500/10 text-red-500 uppercase tracking-widest">
-                {t("settings.modals.pwa_error")}
+              <div className="text-[10px] font-black px-5 py-4 rounded-xl bg-red-500/5 border border-red-500/10 text-red-500 uppercase tracking-widest text-center">
+                {installError}
               </div>
             )}
             <div className="flex gap-4 border-t border-white/5 pt-8 rtl:flex-row-reverse">

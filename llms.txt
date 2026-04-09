@@ -1,0 +1,29 @@
+# Expense Tracker AI - Enterprise System
+
+> Enterprise-grade financial management system with Google Gemini AI integration and RTL support.
+
+## Core Architectural Map
+
+### Backend (Node.js/TypeScript)
+- **Entry**: `backend/src/server.ts`
+- **AI Controller**: `backend/src/controllers/ai.controller.ts` (Gemini SDK integration)
+- **Recurring Logic**: `backend/src/controllers/recurring.controller.ts`
+- **Models**: `backend/src/models/` (Mongoose)
+- **Routes**: `backend/src/routes/`
+
+### Frontend (React 19/TypeScript)
+- **Entry**: `frontend/src/main.jsx`
+- **Layout**: `frontend/src/App.jsx`
+- **Localization**: `frontend/src/i18n.js` (English/Arabic RTL support)
+- **State**: `frontend/src/context/`
+- **Components**: `frontend/src/components/`
+
+## Key Capabilities
+- **AI Analytics**: Generative insights using Google Gemini.
+- **Voice-to-Text**: Audio transcription for logs.
+- **Automated Finance**: Recurring transaction management.
+- **PWA**: Offline-first mobility.
+
+## Development Checklist
+- `backend/.env` requires `MONGO_URI`, `JWT_SECRET`, and `GEMINI_API_KEY`.
+- `frontend/.env` requires `VITE_API_URL`.

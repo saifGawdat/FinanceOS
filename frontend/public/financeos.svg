@@ -1,0 +1,29 @@
+<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00c6ff"></stop>
+      <stop offset="100%" stop-color="#0072ff"></stop>
+    </linearGradient>
+    <linearGradient id="grayGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e0e0e0"></stop>
+      <stop offset="100%" stop-color="#888"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="300" height="300" fill="#0b0f1a"></rect>
+
+  <!-- Circle -->
+  <circle cx="150" cy="150" r="130" stroke="#00c6ff" stroke-width="3" fill="none"></circle>
+
+  <!-- Icon (F shape) -->
+  <polygon points="120,90 150,110 150,150 120,130" fill="url(#blueGrad)"></polygon>
+  <polygon points="150,110 180,90 180,130 150,150" fill="url(#grayGrad)"></polygon>
+  <polygon points="120,140 150,160 150,200 120,180" fill="url(#blueGrad)"></polygon>
+  <polygon points="150,160 180,140 180,180 150,200" fill="url(#grayGrad)"></polygon>
+
+  <!-- Text -->
+  <text x="150" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#ffffff">
+    Finance<tspan fill="#00c6ff">OS</tspan>
+  </text>
+</svg>

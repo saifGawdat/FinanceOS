@@ -10,18 +10,39 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      includeAssets: [
+        "favicon.ico",
+        "apple-touch-icon.png",
+        "mask-icon.svg",
+        "financeos.svg",
+      ],
       manifest: {
-        name: "Financial Management System",
-        short_name: "FinTrack",
+        name: "FinanceOS - Enterprise Financial System",
+        short_name: "FinanceOS",
         description: "Enterprise-grade financial management solution",
         theme_color: "#0f172a",
         icons: [
           {
-            src: "pwa-icon-512.png",
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "icon-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+          },
+          {
+            src: "financeos.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any",
+          },
+          {
+            src: "financeos.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "maskable",
           },
         ],
       },
