@@ -8,6 +8,7 @@ export const dashboardKeys = {
   stats: (month, year) => ["dashboard", "stats", month, year],
   charts: (month, year) => ["dashboard", "charts", month, year],
   recent: (month, year) => ["dashboard", "recent", month, year],
+  receivables: ["dashboard", "receivables"],
 };
 
 const fetchStats = async (month, year) => {
@@ -28,6 +29,11 @@ const fetchRecentTransactions = async (month, year) => {
   const { data } = await API.get("/dashboard/recent", {
     params: { month, year },
   });
+  return data;
+};
+
+const fetchReceivables = async () => {
+  const { data } = await API.get("/dashboard/receivables");
   return data;
 };
 
@@ -57,5 +63,13 @@ export const useGetDashboardRecent = (month, year) => {
     queryFn: () => fetchRecentTransactions(month, year),
     staleTime: 0,
     enabled: !!month && !!year,
+  });
+};
+
+export const useGetDashboardReceivables = () => {
+  return useQuery({
+    queryKey: dashboardKeys.receivables,
+    queryFn: fetchReceivables,
+    staleTime: 0,
   });
 };

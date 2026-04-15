@@ -3,6 +3,19 @@ import { Expense } from "../models/Expense";
 import { Employee } from "../models/Employee";
 import { ExpenseCategory } from "../models/ExpenseCategory";
 import { EmployeeTransaction } from "../models/EmployeeTransaction";
+import { Invoice } from "../models/Invoice";
+
+const deriveInvoiceStatus = (invoice: any) => {
+  if (invoice.cancelledAt || invoice.status === "cancelled") return "cancelled";
+  if (Number(invoice.balanceDue || 0) <= 0 && Number(invoice.total || 0) > 0) {
+    return "paid";
+  }
+  if (Number(invoice.amountPaid || 0) > 0) {
+    return new Date(invoice.dueDate) < new Date() ? "overdue" : "partially_paid";
+  }
+  if (!invoice.sentAt) return "draft";
+  return new Date(invoice.dueDate) < new Date() ? "overdue" : "sent";
+};
 
 export class DashboardService {
   async getStats(userId: string, month?: number, year?: number): Promise<any> {
@@ -44,6 +57,17 @@ export class DashboardService {
 
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
     const balance = totalIncome - totalExpense;
+    const allInvoices = await Invoice.find({ user: userId }).lean();
+    const normalizedInvoices = allInvoices.map((invoice) => ({
+      ...invoice,
+      status: deriveInvoiceStatus(invoice),
+    }));
+    const openInvoices = normalizedInvoices.filter((invoice) =>
+      ["sent", "partially_paid", "overdue"].includes(invoice.status),
+    );
+    const overdueInvoices = normalizedInvoices.filter(
+      (invoice) => invoice.status === "overdue",
+    );
 
     return {
       totalIncome,
@@ -51,6 +75,15 @@ export class DashboardService {
       balance,
       incomeCount: incomes.length,
       expenseCount: expenses.length,
+      receivables: openInvoices.reduce(
+        (sum, invoice) => sum + invoice.balanceDue,
+        0,
+      ),
+      overdueReceivables: overdueInvoices.reduce(
+        (sum, invoice) => sum + invoice.balanceDue,
+        0,
+      ),
+      overdueInvoiceCount: overdueInvoices.length,
     };
   }
 
@@ -343,5 +376,49 @@ export class DashboardService {
       .slice(0, 5);
 
     return transactions;
+  }
+
+  async getReceivables(userId: string): Promise<any> {
+    const invoices = await Invoice.find({ user: userId })
+      .populate("customer", "name brandName")
+      .sort({ dueDate: 1 })
+      .lean();
+
+    const normalizedInvoices = invoices.map((invoice) => ({
+      ...invoice,
+      status: deriveInvoiceStatus(invoice),
+    }));
+
+    const open = normalizedInvoices.filter((invoice) =>
+      ["sent", "partially_paid", "overdue"].includes(invoice.status),
+    );
+    const overdue = normalizedInvoices.filter(
+      (invoice) => invoice.status === "overdue",
+    );
+
+    const topOverdueCustomers = overdue.reduce(
+      (map: Record<string, number>, invoice: any) => {
+        const customerName = invoice.customer?.brandName
+          ? `${invoice.customer.name} (${invoice.customer.brandName})`
+          : invoice.customer?.name || "Unknown";
+        map[customerName] = (map[customerName] || 0) + invoice.balanceDue;
+        return map;
+      },
+      {},
+    );
+
+    return {
+      totalReceivables: open.reduce((sum, invoice) => sum + invoice.balanceDue, 0),
+      overdueReceivables: overdue.reduce(
+        (sum, invoice) => sum + invoice.balanceDue,
+        0,
+      ),
+      openInvoiceCount: open.length,
+      overdueInvoiceCount: overdue.length,
+      topOverdueCustomers: Object.entries(topOverdueCustomers)
+        .map(([customerName, balanceDue]) => ({ customerName, balanceDue }))
+        .sort((a, b) => Number(b.balanceDue) - Number(a.balanceDue))
+        .slice(0, 5),
+    };
   }
 }

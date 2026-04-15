@@ -14,6 +14,7 @@ import {
   useGetDashboardStats,
   useGetDashboardCharts,
   useGetDashboardRecent,
+  useGetDashboardReceivables,
 } from "../../hooks/queries/useDashboard";
 import { useGetGoals } from "../../hooks/queries/useGoals";
 import {
@@ -21,6 +22,8 @@ import {
   IoTrendingUpOutline,
   IoTrendingDownOutline,
   IoWalletOutline,
+  IoAlertCircleOutline,
+  IoReceiptOutline,
 } from "react-icons/io5";
 
 const Home = () => {
@@ -37,10 +40,16 @@ const Home = () => {
     useGetDashboardCharts(month, year);
   const { data: recentTransactionsData, isLoading: isLoadingRecent } =
     useGetDashboardRecent(month, year);
+  const { data: receivablesData, isLoading: isLoadingReceivables } =
+    useGetDashboardReceivables();
   const { data: goalsData, isLoading: isLoadingGoals } = useGetGoals();
 
   const loading =
-    isLoadingStats || isLoadingCharts || isLoadingRecent || isLoadingGoals;
+    isLoadingStats ||
+    isLoadingCharts ||
+    isLoadingRecent ||
+    isLoadingGoals ||
+    isLoadingReceivables;
 
   const stats = statsData || { totalIncome: 0, totalExpense: 0, balance: 0 };
   const chartData = chartDataData || {
@@ -51,6 +60,12 @@ const Home = () => {
   };
   const recentTransactions = recentTransactionsData || [];
   const goals = goalsData || [];
+  const receivables = receivablesData || {
+    totalReceivables: 0,
+    overdueReceivables: 0,
+    openInvoiceCount: 0,
+    overdueInvoiceCount: 0,
+  };
 
   const savingsRate =
     stats.totalIncome > 0
@@ -113,7 +128,7 @@ const Home = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
         <SummaryCard
           title={t("home.stats.balance")}
           amount={stats.balance}
@@ -134,6 +149,23 @@ const Home = () => {
           amount={stats.totalExpense}
           icon={IoTrendingDownOutline}
           iconColor="text-red-400"
+          bgGradient="from-red-500 to-red-600"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <SummaryCard
+          title="Receivables"
+          amount={receivables.totalReceivables}
+          icon={IoReceiptOutline}
+          iconColor="text-amber-400"
+          bgGradient="from-blue-500 to-blue-500"
+        />
+        <SummaryCard
+          title="Overdue AR"
+          amount={receivables.overdueReceivables}
+          icon={IoAlertCircleOutline}
+          iconColor="text-orange-400"
           bgGradient="from-red-500 to-red-600"
         />
       </div>
@@ -188,6 +220,43 @@ const Home = () => {
             <GoalsProgressChart goals={goals} limit={6} height={220} />
           </Card>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <Card
+          title="Receivables Pulse"
+          subtitle="Open invoice count, overdue count, and outstanding exposure"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-black">
+                Open invoices
+              </p>
+              <p className="mt-2 text-2xl font-black text-white">
+                {receivables.openInvoiceCount}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-black">
+                Overdue invoices
+              </p>
+              <p className="mt-2 text-2xl font-black text-red-400">
+                {receivables.overdueInvoiceCount}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-black">
+                Outstanding AR
+              </p>
+              <p className="mt-2 text-xl font-black text-blue-400">
+                {new Intl.NumberFormat("en-GB", {
+                  style: "currency",
+                  currency: "GBP",
+                }).format(receivables.totalReceivables || 0)}
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
     </DashboardLayout>
   );

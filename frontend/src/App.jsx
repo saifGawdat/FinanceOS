@@ -20,6 +20,7 @@ import Settings from "./pages/Dashboard/Settings";
 import AIAssistant from "./components/AIAssistant/AIAssistant";
 import Goals from "./pages/Dashboard/Goals";
 import RecurringTransactions from "./pages/Dashboard/RecurringTransactions";
+import Invoices from "./pages/Dashboard/Invoices";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -129,7 +130,15 @@ function App() {
               <Settings />
             </ProtectedRoute>
           }
-        />{" "}
+        />
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              <Invoices />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <AIAssistant />
     </Router>

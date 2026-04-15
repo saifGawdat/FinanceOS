@@ -57,4 +57,17 @@ export class DashboardController {
       next(error);
     }
   };
+
+  getReceivables = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const receivables = await this.dashboardService.getReceivables(req.userId!);
+      res.json(receivables);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

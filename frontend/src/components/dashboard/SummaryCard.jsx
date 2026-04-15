@@ -4,6 +4,7 @@ import { formatCurrency } from "../../utils/formatters";
 const SummaryCard = ({
   title,
   amount,
+  format = "currency",
   // eslint-disable-next-line no-unused-vars
   icon: Icon,
   iconColor,
@@ -31,6 +32,11 @@ const SummaryCard = ({
     ? "bg-white/10"
     : iconBgMap[bgGradient] || "bg-blue-500/10";
 
+  const displayValue =
+    format === "number"
+      ? new Intl.NumberFormat("en-US").format(Number(amount || 0))
+      : formatCurrency(amount);
+
   return (
     <div
       className={`bg-[#0e0e12] border border-white/5 ${borderColor} border-l-4 rounded-2xl p-6 transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-black/50 w-full group`}
@@ -39,7 +45,7 @@ const SummaryCard = ({
         <div>
           <p className="text-gray-400 text-sm font-medium mb-1">{title}</p>
           <h3 className="text-2xl font-bold text-gray-100">
-            {formatCurrency(amount)}
+            {displayValue}
           </h3>
         </div>
 

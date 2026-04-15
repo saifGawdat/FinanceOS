@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import Modal from "../../components/ui/Modal";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -14,6 +15,7 @@ import {
   IoDownloadOutline,
   IoPencilOutline,
   IoLogoWhatsapp,
+  IoReceiptOutline,
 } from "react-icons/io5";
 import * as XLSX from "xlsx";
 import { formatCurrency } from "../../utils/formatters";
@@ -21,6 +23,7 @@ import { formatCurrency } from "../../utils/formatters";
 
 const Customers = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -101,6 +104,10 @@ const Customers = () => {
       type: "delete",
       customerId: id,
     });
+  };
+
+  const handleViewInvoices = (customerId) => {
+    navigate(`/invoices?customerId=${customerId}`);
   };
 
   const confirmCustomerAction = async () => {
@@ -259,6 +266,7 @@ const Customers = () => {
                   brandName: "",
                   phoneNumber: "",
                   monthlyAmount: "",
+                  paymentDeadline: "",
                 });
                 setShowAddModal(true);
               }}
@@ -360,8 +368,18 @@ const Customers = () => {
                         </div>
                         <div className="space-y-1 hidden lg:block">
                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t("customers.labels.ltv")}</p>
-                          <p className="text-xs font-bold text-gray-500 italic">{t("customers.labels.processing")}</p>
+                          <p className="text-xs font-bold text-gray-300">
+                            {formatCurrency(Number(customer.openInvoiceBalance || 0))}
+                          </p>
                         </div>
+                      </div>
+                      <div className="mt-6 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[0.18em] text-gray-500">
+                        <span className="rounded-full border border-white/5 px-3 py-2 bg-[#09090c]">
+                          Open invoices: {customer.openInvoiceCount || 0}
+                        </span>
+                        <span className="rounded-full border border-white/5 px-3 py-2 bg-[#09090c]">
+                          Overdue invoices: {customer.overdueInvoiceCount || 0}
+                        </span>
                       </div>
                     </div>
 
@@ -394,6 +412,13 @@ const Customers = () => {
                         >
                           <IoLogoWhatsapp size={18} />
                         </a>
+                        <button
+                          onClick={() => handleViewInvoices(customer._id)}
+                          className="p-3 text-gray-500 hover:text-amber-400 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"
+                          title="View invoices"
+                        >
+                          <IoReceiptOutline size={18} />
+                        </button>
                         <button
                           onClick={() => handleEdit(customer)}
                           className="p-3 text-gray-500 hover:text-blue-500 bg-[#09090c] border border-white/5 rounded-xl transition-all group-hover:border-white/10"

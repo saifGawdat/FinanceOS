@@ -33,4 +33,12 @@ export const queryKeys = {
     list: (filters) => ["goals", "list", filters],
     detail: (id) => ["goals", "detail", id],
   },
+
+  invoices: {
+    all: ["invoices"],
+    list: (filters) => ["invoices", "list", filters],
+    detail: (id) => ["invoices", "detail", id],
+    summary: ["invoices", "summary"],
+    aging: ["invoices", "aging"],
+  },
 };

@@ -6,8 +6,21 @@ import {
   PayCustomerDTO,
 } from "../dtos/customer.dto";
 import { PaginatedResponseDTO } from "../dtos/pagination.dto";
-import { NotFoundError, UnauthorizedError } from "../errors";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../errors";
+import { Invoice } from "../models/Invoice";
 import { MonthlySummaryService } from "./monthly-summary.service";
+
+const deriveInvoiceStatus = (invoice: any) => {
+  if (invoice.cancelledAt || invoice.status === "cancelled") return "cancelled";
+  if (Number(invoice.balanceDue || 0) <= 0 && Number(invoice.total || 0) > 0) {
+    return "paid";
+  }
+  if (Number(invoice.amountPaid || 0) > 0) {
+    return new Date(invoice.dueDate) < new Date() ? "overdue" : "partially_paid";
+  }
+  if (!invoice.sentAt) return "draft";
+  return new Date(invoice.dueDate) < new Date() ? "overdue" : "sent";
+};
 
 export class CustomerService {
   private monthlySummaryService = new MonthlySummaryService();
@@ -46,9 +59,58 @@ export class CustomerService {
       .limit(validatedLimit)
       .lean();
 
+    const invoices = await Invoice.find({
+      user: userId,
+      customer: { $in: customers.map((c: any) => c._id) },
+    }).lean();
+
+    const invoiceSummaryByCustomer = invoices.reduce(
+      (
+        acc: Record<
+          string,
+          {
+            openInvoiceBalance: number;
+            overdueInvoiceCount: number;
+            openInvoiceCount: number;
+          }
+        >,
+        invoice: any,
+      ) => {
+        const customerKey = invoice.customer.toString();
+        if (!acc[customerKey]) {
+          acc[customerKey] = {
+            openInvoiceBalance: 0,
+            overdueInvoiceCount: 0,
+            openInvoiceCount: 0,
+          };
+        }
+
+        const status = deriveInvoiceStatus(invoice);
+
+        if (["sent", "partially_paid", "overdue"].includes(status)) {
+          acc[customerKey].openInvoiceBalance += invoice.balanceDue;
+          acc[customerKey].openInvoiceCount += 1;
+        }
+
+        if (status === "overdue") {
+          acc[customerKey].overdueInvoiceCount += 1;
+        }
+
+        return acc;
+      },
+      {},
+    );
+
     if (!month || !year) {
       return {
-        data: customers,
+        data: customers.map((customer: any) => ({
+          ...customer,
+          ...(invoiceSummaryByCustomer[customer._id.toString()] || {
+            openInvoiceBalance: 0,
+            overdueInvoiceCount: 0,
+            openInvoiceCount: 0,
+          }),
+        })),
         pagination: {
           currentPage: validatedPage,
           totalPages,
@@ -76,6 +138,11 @@ export class CustomerService {
       );
       return {
         ...customer,
+        ...(invoiceSummaryByCustomer[customer._id.toString()] || {
+          openInvoiceBalance: 0,
+          overdueInvoiceCount: 0,
+          openInvoiceCount: 0,
+        }),
         isPaid: !!payment,
         paymentId: payment ? payment._id : null,
       };
@@ -214,6 +281,18 @@ export class CustomerService {
 
     if (customer.user.toString() !== userId) {
       throw new UnauthorizedError("Not authorized");
+    }
+
+    const invoiceCount = await Invoice.countDocuments({
+      user: userId,
+      customer: customerId,
+      status: { $ne: "cancelled" },
+    });
+
+    if (invoiceCount > 0) {
+      throw new ConflictError(
+        "Customer has active invoices. Cancel those invoices before deleting the customer.",
+      );
     }
 
     await Customer.findByIdAndDelete(customerId);

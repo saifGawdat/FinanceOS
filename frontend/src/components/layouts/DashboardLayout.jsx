@@ -15,6 +15,7 @@ import {
   IoSettingsOutline,
   IoTrophyOutline,
   IoRepeatOutline,
+  IoReceiptOutline,
 } from "react-icons/io5";
 
 const DashboardLayout = ({ children }) => {
@@ -41,6 +42,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/monthly-salaries", icon: IoCashOutline, label: t("sidebar.salaries") },
     { path: "/profit-summary", icon: IoStatsChartOutline, label: t("sidebar.profit") },
     { path: "/customers", icon: IoPeopleOutline, label: t("sidebar.customers") },
+    { path: "/invoices", icon: IoReceiptOutline, label: "Invoices" },
     { path: "/settings", icon: IoSettingsOutline, label: t("sidebar.settings") },
   ];
 
@@ -73,24 +75,24 @@ const DashboardLayout = ({ children }) => {
         `}
         >
           {/* Logo Section */}
-          <div className="p-6 border-b border-white/5">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <IoStatsChartOutline className="text-white" size={16} />
+          <div className="p-4 border-b border-white/5">
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <IoStatsChartOutline className="text-white" size={14} />
               </div>
-              <h1 className="text-lg font-bold text-white tracking-tight">
+              <h1 className="text-base font-bold text-white tracking-tight">
                 FinanceOS
               </h1>
             </div>
-            <p className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold ml-11 rtl:ml-0 rtl:mr-11">
+            <p className="text-[9px] text-gray-600 uppercase tracking-[0.18em] font-bold ml-10 rtl:ml-0 rtl:mr-10">
               {t("sidebar.management")}
             </p>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-8 overflow-y-auto">
+          <nav className="flex-1 px-3 py-3 space-y-5 overflow-hidden">
             <div>
-              <p className="px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">
+              <p className="px-3 text-[9px] font-bold text-gray-600 uppercase tracking-[0.18em] mb-3">
                 {t("sidebar.main_menu")}
               </p>
               <ul className="space-y-1">
@@ -99,14 +101,14 @@ const DashboardLayout = ({ children }) => {
                     <Link
                       to={item.path}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                      className={`flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group ${
                         location.pathname === item.path
                           ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
                           : "text-gray-500 hover:text-gray-200 hover:bg-white/3"
                       }`}
                     >
                       <item.icon
-                        size={18}
+                        size={16}
                         className={
                           location.pathname === item.path
                             ? ""
@@ -122,25 +124,25 @@ const DashboardLayout = ({ children }) => {
           </nav>
 
           {/* Profile & Logout */}
-          <div className="p-4 border-t border-white/5 bg-black/20">
-            <div className="flex items-center gap-3 px-3 py-4 mb-2">
-              <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-700 to-gray-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white">
+          <div className="p-3 border-t border-white/5 bg-black/20">
+            <div className="flex items-center gap-3 px-3 py-3 mb-1">
+              <div className="w-7 h-7 rounded-full bg-linear-to-br from-gray-700 to-gray-800 border border-white/10 flex items-center justify-center text-[11px] font-bold text-white">
                 {user?.name?.charAt(0) || "A"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-gray-200 truncate">
+                <p className="text-[11px] font-bold text-gray-200 truncate">
                   {user?.name}
                 </p>
-                <p className="text-[10px] text-gray-600 font-medium truncate uppercase tracking-tighter">
+                <p className="text-[9px] text-gray-600 font-medium truncate uppercase tracking-tighter">
                   {t("sidebar.administrator")}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2.5 w-full text-gray-500 hover:bg-red-500/10 hover:text-red-400 rounded-xl text-xs font-bold transition-all"
+              className="flex items-center gap-3 px-3 py-2 w-full text-gray-500 hover:bg-red-500/10 hover:text-red-400 rounded-xl text-[11px] font-bold transition-all"
             >
-              <IoLogOutOutline size={18} />
+              <IoLogOutOutline size={16} />
               <span>{t("sidebar.logout")}</span>
             </button>
           </div>
